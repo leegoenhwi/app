@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:app = "http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id = "@+id/bottombaritem_gps"
+        android:icon = "@drawable/ic_location_on_white_24dp"
+        android:title = "@string/location_bus"
+        app:showAsAction = "ifRoom" />
+
+    <item
+        android:id = "@+id/bottombaritem_personnel"
+        android:icon = "@drawable/ic_people_white_24dp"
+        android:title = "@string/bus_people"
+        app:showAsAction = "ifRoom"/>
+
+    <item
+        android:id = "@+id/bottombaritem_quick_bus_time"
+        android:icon = "@drawable/ic_history_black_24dp"
+        android:title = "@string/quick_time"
+        app:showAsAction = "ifRoom"/>
+
+</menu>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/gps"
+            android:title="셔틀버스 위치"
+            android:icon="@drawable/ic_location_on_black_24dp"
+            android:checked="true"/>
+        <item
+            android:id="@+id/personnel"
+            android:title="셔틀장 인원"
+            android:icon="@drawable/ic_people_black_24dp"/>
+        <item
+            android:id="@+id/quick_bus_time"
+            android:title="빠른 시간"
+            android:icon="@drawable/ic_history_black_24dp"/>
+    </group>
+
+
+
+        <item
+            android:id="@+id/bus_time"
+            android:title="셔틀버스 시간표"
+            android:icon="@drawable/ic_event_black_24dp" />
+
+        <item
+            android:id="@+id/notice"
+            android:title="버전 정보"
+            android:icon="@drawable/ic_assignment_black_24dp"/>
+
+
+    <item
+        android:id="@+id/infor"
+        android:title="도움말"
+        android:icon="@drawable/ic_info_black_24dp"/>
+
+
+
+</menu>

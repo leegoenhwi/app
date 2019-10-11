@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorControlNormal">@color/colortitle</item>
+
+        <!-- 안드로이드 하단 네비게이션바 API27 부터 적용 -->
+        <item name="android:navigationBarColor">@color/colortitle</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarDividerColor">@color/nav_bar_divider</item>
+
+        <!-- 안드로이드 상단 상태바  -->
+        <item name="android:statusBarColor">@color/colormain</item>
+
+        <!-- Customize your theme here. -->
+    </style>
+</resources>

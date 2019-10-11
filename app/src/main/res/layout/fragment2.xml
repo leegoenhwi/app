@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colortitle"
+    android:weightSum="30"
+    android:id="@+id/swipe_layout2">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="30"
+        android:gravity="center">
+
+        <!--app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"-->
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10">
+
+            <LinearLayout
+                android:layout_width="270dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginEnd="81dp"
+                android:background="@drawable/linear_shadow"
+                android:orientation="horizontal"
+                android:elevation="1dp"
+                android:paddingBottom="0.1dp"
+                android:weightSum="10"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:ignore="DisableBaselineAlignment,MissingConstraints,UselessLeaf">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"
+                    android:background="@color/colormain"
+                    tools:ignore="InefficientWeight,Suspicious0dp">
+
+                </FrameLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="9.7"
+                    android:background="#FAFAFA"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/osan"
+                        android:layout_width="110dp"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:text="@string/osan_stay"
+                        android:textColor="#323232"
+                        android:textSize="15sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="NestedWeights" />
+
+                    <TextView
+                        android:id="@+id/osan_num"
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="7dp"
+                        android:gravity="right"
+                        android:text="@string/zero"
+                        android:textColor="@color/colormain"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/osan"
+                        tools:ignore="RtlHardcoded" />
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginTop="7dp"
+                        android:text="@string/number"
+                        android:textColor="#323232"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toEndOf="@+id/osan_num"
+                        app:layout_constraintTop_toBottomOf="@+id/osan" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10">
+
+            <LinearLayout
+                android:layout_width="270dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginTop="82dp"
+                android:layout_marginEnd="81dp"
+                android:layout_marginBottom="82dp"
+                android:background="@drawable/linear_shadow"
+                android:orientation="horizontal"
+                android:elevation="1dp"
+                android:paddingBottom="0dp"
+                android:weightSum="10"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DisableBaselineAlignment,MissingConstraints,UselessLeaf">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"
+                    android:background="@color/colormain"
+                    tools:ignore="InefficientWeight,Suspicious0dp">
+
+                </FrameLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="9.7"
+                    android:background="#FAFAFA"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/cheonan"
+                        android:layout_width="110dp"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:text="@string/cheonan_stay"
+                        android:textColor="#323232"
+                        android:textSize="15sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="NestedWeights" />
+
+                    <TextView
+                        android:id="@+id/cheonan_num"
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="7dp"
+                        android:gravity="right"
+                        android:text="@string/zero"
+                        android:textColor="@color/colormain"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cheonan"
+                        tools:ignore="RtlHardcoded" />
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginTop="7dp"
+                        android:text="@string/number"
+                        android:textColor="#323232"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toEndOf="@+id/cheonan_num"
+                        app:layout_constraintTop_toBottomOf="@+id/cheonan" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10">
+
+            <LinearLayout
+                android:layout_width="270dp"
+                android:layout_height="80dp"
+                android:layout_marginStart="80dp"
+                android:layout_marginEnd="81dp"
+                android:background="@drawable/linear_shadow"
+                android:orientation="horizontal"
+                android:elevation="1dp"
+                android:paddingBottom="0dp"
+                android:weightSum="10"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DisableBaselineAlignment,MissingConstraints,UselessLeaf">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3"
+                    android:background="@color/colormain"
+                    tools:ignore="InefficientWeight,Suspicious0dp">
+
+                </FrameLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="9.7"
+                    android:background="#FAFAFA"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/cheonan_t"
+                        android:layout_width="150dp"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:text="@string/cheonan_t_stay"
+                        android:textColor="#323232"
+                        android:textSize="15sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="NestedWeights" />
+
+                    <TextView
+                        android:id="@+id/cheonan_t_num"
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="7dp"
+                        android:gravity="right"
+                        android:text="@string/zero"
+                        android:textColor="@color/colormain"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cheonan_t"
+                        tools:ignore="RtlHardcoded" />
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginTop="7dp"
+                        android:text="@string/number"
+                        android:textColor="#323232"
+                        android:textSize="14sp"
+                        app:layout_constraintStart_toEndOf="@+id/cheonan_t_num"
+                        app:layout_constraintTop_toBottomOf="@+id/cheonan_t" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+

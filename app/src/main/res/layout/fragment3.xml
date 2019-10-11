@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10"
+    >
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_weight="3"
+    android:background="@color/colortitle"
+    android:elevation="5dp"
+    android:orientation="vertical"
+    android:gravity="center">
+
+        <com.nex3z.togglebuttongroup.SingleSelectToggleGroup
+            android:id="@+id/group_choices"
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+        <com.nex3z.togglebuttongroup.button.CircularToggle
+            android:id="@+id/choice_a"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="월"
+
+            app:tbgMarkerColor="@color/colormain"
+            tools:ignore="HardcodedText" />
+
+        <com.nex3z.togglebuttongroup.button.CircularToggle
+            android:id="@+id/choice_b"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="화"
+
+            app:tbgMarkerColor="@color/colormain"
+            tools:ignore="HardcodedText" />
+
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_c"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="수"
+
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
+
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_d"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="목"
+
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
+
+
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_e"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="금"
+
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
+
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_f"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="토"
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
+
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_g"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일"
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
+
+
+        </com.nex3z.togglebuttongroup.SingleSelectToggleGroup>
+
+
+    <com.nex3z.togglebuttongroup.SingleSelectToggleGroup
+        android:id="@+id/group_choices2"
+        android:paddingTop="15dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center">
+
+        <com.nex3z.togglebuttongroup.button.LabelToggle
+            android:id="@+id/choice_osan"
+            android:text="아산역"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tbgMarkerColor="@color/colormain"
+            tools:ignore="HardcodedText" />
+
+        <com.nex3z.togglebuttongroup.button.LabelToggle
+            android:id="@+id/choice_Cheonan_terminal"
+            android:paddingLeft="29dp"
+            android:text="천안 터미널"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tbgMarkerColor="@color/colormain"
+            tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
+
+        <com.nex3z.togglebuttongroup.button.LabelToggle
+            android:id="@+id/choice_Cheonan"
+            android:paddingLeft="29dp"
+            android:text="천안역"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tbgMarkerColor="@color/colormain"
+            tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
+
+    </com.nex3z.togglebuttongroup.SingleSelectToggleGroup>
+
+</LinearLayout>
+
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:id="@+id/refresh_Layout3"
+        android:layout_height="380dp"
+        android:layout_weight="7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/group_choices">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colortitle"
+        android:weightSum="10"
+        android:orientation="horizontal">
+
+
+
+
+
+    </LinearLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+</LinearLayout>

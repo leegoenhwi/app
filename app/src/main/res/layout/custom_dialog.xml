@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="250dp"
+    android:layout_height="150dp"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:weightSum="35"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_weight="9"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:textSize="19sp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:text="@string/dialog"
+        android:background="@color/colormain"
+        android:fontFamily="@font/spoqa_han_sans_bold" />
+
+    <TextView
+        android:layout_weight="6"
+        android:id="@+id/dialog_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center|bottom"
+        android:textSize="10sp"
+        android:textColor="#828282"
+        android:text="@string/dialog_txt"
+        android:background="@color/colortitle"
+        tools:ignore="SmallSp" />
+
+    <TextView
+        android:layout_weight="11"
+        android:id="@+id/dialog_text2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center|top"
+        android:textSize="25sp"
+        android:textColor="#323232"
+        android:text="@string/_1_0_0"
+        android:background="@color/colortitle"
+        android:fontFamily="@font/spoqa_han_sans_bold"/>
+
+
+    <Button
+        android:layout_weight="9"
+        android:id="@+id/dialog_btn"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/custom_ripple_effect"
+        android:textColor="#000000"
+        android:text="@string/ok"
+        android:textSize="13dp"
+        android:elevation="8dp"
+        tools:ignore="SpUsage"
+        android:fontFamily="@font/spoqa_han_sans_regular"/>
+
+
+</LinearLayout>

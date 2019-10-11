@@ -1,0 +1,36 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorControlNormal">@color/colortitle</item>
+
+        <!-- 안드로이드 상단 상태바  -->
+        <item name="android:statusBarColor">@color/colormain</item>
+
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/background_splash</item>
+        <item name="android:statusBarColor">@color/colormain</item>
+        <item name="android:navigationBarColor">@color/colormain</item>
+    </style>
+
+    <style name="NavigationView" >
+        <item name="fontFamily">@font/spoqa_han_sans_regular</item>
+
+    </style>
+
+
+    <style name="BottomNavigation">
+        <item name="android:background">@color/colortitle</item>
+        <item name="itemBackground">@drawable/navigation_bar_item_bg</item>
+        <item name="itemIconTint">@drawable/selector_bottombar</item>
+        <item name="itemTextColor">@drawable/selector_bottombar</item>
+        <item name="paddingStart">@dimen/cardview_default_elevation</item>
+        <item name="paddingEnd">@dimen/cardview_default_elevation</item>
+    </style>
+
+
+
+</resources>

@@ -1,0 +1,30 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">선문버스</string>
+    <string name="main_title">선문버스</string>
+    <string name="todo">TODO</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="location_bus">셔틀버스 위치</string>
+    <string name="bus_people">셔틀장 인원</string>
+    <string name="quick_time">빠른 시간</string>
+    <string name="help">문의 : 10131751z@gmail.com</string>
+    <string name="nav_title">선문버스 알림YEE</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="f_text_1" tools:ignore="ExtraTranslation">프래그먼트 1</string>
+    <string name="f_text_2" tools:ignore="ExtraTranslation">프래그먼트 2</string>
+    <string name="f_text_3" tools:ignore="ExtraTranslation">프래그먼트 3</string>
+    <string name="test">test</string>
+    <string name="ok">확인</string>
+    <string name="dialog">버전 정보</string>
+    <string name="_1_0_0">1.0.0</string>
+    <string name="dialog_txt">현재 버전</string>
+    <string name="osan_stay">아산역 대기인원</string>
+    <string name="zero">0</string>
+    <string name="number">명</string>
+    <string name="cheonan_stay">천안역 대기인원</string>
+    <string name="cheonan_t_stay">천안 터미널 대기인원</string>
+
+
+</resources>
