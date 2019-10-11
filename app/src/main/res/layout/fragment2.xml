@@ -15,6 +15,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="30"
+        android:background="#F7F7F7"
         android:gravity="center">
 
         <!--app:layout_constraintBottom_toBottomOf="parent"
@@ -57,7 +58,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="9.7"
-                    android:background="#FAFAFA"
+                    android:background="#FFFFFF"
                     android:orientation="vertical">
 
                     <TextView
@@ -143,7 +144,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="9.7"
-                    android:background="#FAFAFA"
+                    android:background="#FFFFFF"
                     android:orientation="vertical">
 
                     <TextView
@@ -226,7 +227,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="9.7"
-                    android:background="#FAFAFA"
+                    android:background="#FFFFFF"
                     android:orientation="vertical">
 
                     <TextView
