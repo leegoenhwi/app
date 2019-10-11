@@ -23,10 +23,11 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false"/>
-
+<!--안성민-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDwbTRGsB4X_feqeP0ZuJLuysQ6PS8fov8"/>
+<!--이건휘-->
 <!--        <meta-data-->
 <!--            android:name="com.google.android.geo.API_KEY"-->
 <!--            android:value="AIzaSyDCqSPGJKxubFaUMywmhQUx-w2ThO-E2Gs"/>-->
