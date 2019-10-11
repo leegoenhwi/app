@@ -24,10 +24,12 @@
             android:name="org.apache.http.legacy"
             android:required="false"/>
 
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDCqSPGJKxubFaUMywmhQUx-w2ThO-E2Gs" />
+            android:value="AIzaSyDwbTRGsB4X_feqeP0ZuJLuysQ6PS8fov8"/>
+<!--        <meta-data-->
+<!--            android:name="com.google.android.geo.API_KEY"-->
+<!--            android:value="AIzaSyDCqSPGJKxubFaUMywmhQUx-w2ThO-E2Gs"/>-->
 
         <activity
             android:name=".SplashActivity"
