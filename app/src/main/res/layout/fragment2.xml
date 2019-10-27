@@ -47,25 +47,25 @@
                     <TextView
                         android:id="@+id/osan"
                         android:layout_width="110dp"
-                        android:layout_height="22dp"
+                        android:layout_height="25dp"
                         android:layout_gravity="center"
                         android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:gravity="center"
                         android:text="@string/osan_stay"
                         android:textColor="#3C3C3C"
-                        android:textSize="15sp"
-                        android:gravity="center"
+                        android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.34"
                         app:layout_constraintStart_toEndOf="@+id/textView2"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.24"
+                        app:layout_constraintVertical_bias="0.3"
                         tools:ignore="RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/osan_num"
                         android:layout_width="30dp"
-                        android:layout_height="20dp"
+                        android:layout_height="25dp"
                         android:layout_marginStart="80dp"
                         android:layout_marginTop="15dp"
                         android:layout_marginBottom="16dp"
@@ -78,13 +78,12 @@
                         app:layout_constraintEnd_toStartOf="@+id/textView"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/osan"
-                        app:layout_constraintVertical_bias="0.0"
                         tools:ignore="RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/textView"
                         android:layout_width="wrap_content"
-                        android:layout_height="20dp"
+                        android:layout_height="25dp"
                         android:layout_marginTop="15dp"
                         android:layout_marginEnd="120dp"
                         android:layout_marginBottom="16dp"
@@ -156,25 +155,25 @@
                     <TextView
                         android:id="@+id/cheonan"
                         android:layout_width="110dp"
-                        android:layout_height="22dp"
+                        android:layout_height="25dp"
                         android:layout_gravity="center"
                         android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:gravity="center"
                         android:text="@string/cheonan_stay"
                         android:textColor="#3C3C3C"
-                        android:textSize="15sp"
-                        android:gravity="center"
+                        android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.34"
                         app:layout_constraintStart_toEndOf="@+id/textView5"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.24"
+                        app:layout_constraintVertical_bias="0.3"
                         tools:ignore="RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/cheonan_num"
                         android:layout_width="30dp"
-                        android:layout_height="20dp"
+                        android:layout_height="25dp"
                         android:layout_marginStart="80dp"
                         android:layout_marginTop="15dp"
                         android:layout_marginBottom="16dp"
@@ -187,13 +186,12 @@
                         app:layout_constraintEnd_toStartOf="@+id/textView4"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/cheonan"
-                        app:layout_constraintVertical_bias="0.0"
                         tools:ignore="RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/textView4"
                         android:layout_width="wrap_content"
-                        android:layout_height="20dp"
+                        android:layout_height="25dp"
                         android:layout_marginTop="15dp"
                         android:layout_marginEnd="120dp"
                         android:layout_marginBottom="16dp"
@@ -263,25 +261,25 @@
                     <TextView
                         android:id="@+id/cheonan_t"
                         android:layout_width="150dp"
-                        android:layout_height="22dp"
+                        android:layout_height="25dp"
                         android:layout_gravity="center"
                         android:fontFamily="@font/spoqa_han_sans_regular"
                         android:gravity="center"
                         android:text="@string/cheonan_t_stay"
                         android:textColor="#3C3C3C"
-                        android:textSize="15sp"
+                        android:textSize="14sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.48"
                         app:layout_constraintStart_toEndOf="@+id/textView8"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_bias="0.24"
+                        app:layout_constraintVertical_bias="0.3"
                         tools:ignore="RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/cheonan_t_num"
                         android:layout_width="30dp"
-                        android:layout_height="20dp"
+                        android:layout_height="25dp"
                         android:layout_marginStart="80dp"
                         android:layout_marginTop="15dp"
                         android:layout_marginBottom="16dp"
@@ -294,13 +292,12 @@
                         app:layout_constraintEnd_toStartOf="@+id/textView7"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/cheonan_t"
-                        app:layout_constraintVertical_bias="0.0"
                         tools:ignore="RtlHardcoded" />
 
                     <TextView
                         android:id="@+id/textView7"
                         android:layout_width="wrap_content"
-                        android:layout_height="20dp"
+                        android:layout_height="25dp"
                         android:layout_marginTop="15dp"
                         android:layout_marginEnd="120dp"
                         android:layout_marginBottom="16dp"
