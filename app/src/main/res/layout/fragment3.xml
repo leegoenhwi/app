@@ -140,9 +140,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#F7F7F7"
+        android:background="#FFFFFF"
         android:weightSum="10"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        tools:ignore="DisableBaselineAlignment">
 
         <LinearLayout
             android:layout_weight="5"
@@ -154,18 +155,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:weightSum="10"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:ignore="UselessParent">
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:text="학교 출발"
-                    android:gravity="center"/>
-                <ScrollView
+                    android:textColor="#696969"
+                    android:fontFamily="@font/spoqa_han_sans_regular"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    tools:ignore="HardcodedText" />
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/school_start">
+                    android:id="@+id/school_start"
+                    android:background="@color/colortitle"
+                    android:scrollbars="vertical"
+                    android:descendantFocusability="blocksDescendants"
+                    >
 
-                </ScrollView>
+                    <LinearLayout
+                        android:id="@+id/scroll_vertical_layout1"
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        tools:ignore="ScrollViewSize">
+
+                    </LinearLayout>
+
+                </androidx.core.widget.NestedScrollView>
 
             </LinearLayout>
 
@@ -182,18 +203,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:weightSum="10"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                tools:ignore="UselessParent">
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:text="학교 도착"
-                    android:gravity="center"/>
-                <ScrollView
+                    android:textColor="#696969"
+                    android:fontFamily="@font/spoqa_han_sans_regular"
+                    android:textSize="16sp"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    tools:ignore="HardcodedText" />
+                <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/school_arrive">
+                    android:id="@+id/school_arrive"
+                    android:background="@color/colortitle"
+                    android:descendantFocusability="blocksDescendants">
 
-                </ScrollView>
+                    <LinearLayout
+                        android:id="@+id/scroll_vertical_layout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="fill_parent"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        tools:ignore="ScrollViewSize">
+
+                    </LinearLayout>
+
+                </androidx.core.widget.NestedScrollView>
 
             </LinearLayout>
 

@@ -1,16 +1,22 @@
 package com.example.myapplication;
 
+import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Spannable;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -33,9 +39,14 @@ public class Frag3 extends Fragment {
     private SingleSelectToggleGroup singleSelectToggleGroup;
     private SingleSelectToggleGroup singleSelectToggleGroup2;
 
+    private  TextView textView = null;
+    private  TextView textView2 = null;
 
-    private TextView textView;
-    private TextView textView2;
+    private NestedScrollView scrollView_start = null;
+    private NestedScrollView scrollView_arrive = null;
+
+    private LinearLayout scroll_vertical_layout1 = null;
+    private LinearLayout scroll_vertical_layout2 = null;
 
     private ArrayList<String> asan_cam = null;
     private ArrayList<String> cam_asan = null;
@@ -45,6 +56,8 @@ public class Frag3 extends Fragment {
 
     private ArrayList<String> Cheonan_terminal_cam = null;
     private ArrayList<String> cam_Cheonan_terminal = null;
+
+    private TextView[] textViews;
 
     int curr_Day;
 
@@ -59,12 +72,17 @@ public class Frag3 extends Fragment {
 
         singleSelectToggleGroup2 = (SingleSelectToggleGroup) view.findViewById(R.id.group_choices2);
 
+        scrollView_start = (NestedScrollView) view.findViewById(R.id.school_start);
+        scrollView_arrive = (NestedScrollView) view.findViewById(R.id.school_arrive);
 
         refresh_Layout3 = (SwipeRefreshLayout) view.findViewById(R.id.refresh_Layout3);
 
 
+        scroll_vertical_layout1 = (LinearLayout) view.findViewById(R.id.scroll_vertical_layout1);
+        scroll_vertical_layout2 = (LinearLayout) view.findViewById(R.id.scroll_vertical_layout2);
 
-       //textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","      "),TextView.BufferType.SPANNABLE);
+
+        //textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","      "),TextView.BufferType.SPANNABLE);
 
        //색칠
         /*Spannable spannable = (Spannable)textView.getText();
@@ -80,8 +98,67 @@ public class Frag3 extends Fragment {
 
         singleSelectToggleGroup2.check(R.id.choice_osan);
 
+        scroll_view_set(scroll_vertical_layout1);
+        scroll_view_set(scroll_vertical_layout2);
+
+        //size_up(3);
+
+        scroll_log();
+
+
+
         return view;
 
+    }
+
+    //Text_view 생성
+    public void scroll_view_set(LinearLayout linearLayout)
+    {
+        int Textview_num = 50;
+
+        textViews = new TextView[Textview_num];
+
+        for(int i = 0;i<Textview_num;i++)
+        {
+            textViews[i] = new TextView(getActivity());
+            textViews[i].setText("11 : 30");
+            textViews[i].setGravity(Gravity.CENTER);
+            textViews[i].setTextColor(Color.rgb(169,169,169));
+            textViews[i].setTextSize(25);
+            textViews[i].setHeight(190);
+            textViews[i].setId(i);
+            linearLayout.addView(textViews[i]);
+        }
+
+        if(linearLayout.getId() == scroll_vertical_layout1.getId()) {
+            size_up(10);
+        }
+        else
+        {
+            size_up(6);
+        }
+
+    }
+
+    //특정 Text_view 크기 색
+    public void size_up(int x)
+    {
+        textViews[x].setTextSize(35);
+        textViews[x].setTextColor(Color.rgb(248,91,78));
+    }
+
+    //scroll_position_log
+    public void scroll_log()
+    {
+        scrollView_start.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                double scrollViewHeight = scrollView_start.getChildAt(0).getBottom() - scrollView_start.getHeight();
+                double getScrollY = scrollView_start.getScrollY();
+                double scrollPosition = (getScrollY / scrollViewHeight) * 100d;
+                Log.i("scrollview", "scroll Percent Y: " + (int) scrollPosition);
+            }
+        });
     }
 
     //당겨서 새로고침
@@ -849,6 +926,25 @@ public class Frag3 extends Fragment {
 
         System.out.println("온리줌");
 
+
+
+        scrollView_start.post(new Runnable() {
+            @Override
+            public void run() {
+               // scrollView_start.fling(0);
+               // scrollView_start.smoothScrollTo(0,190);
+
+                scrollView_start.scrollTo(0,0);
+
+                scrollView_arrive.scrollTo(0,0);
+
+                //index가 2보다 클경우
+                ObjectAnimator.ofInt(scrollView_start, "scrollY", (10 - 2) *190).setDuration(250).start();
+
+                ObjectAnimator.ofInt(scrollView_arrive, "scrollY", (6 - 2) *190).setDuration(250).start();
+
+            }
+        });
 
         super.onResume();
 

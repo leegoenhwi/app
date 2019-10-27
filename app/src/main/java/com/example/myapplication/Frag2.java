@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,15 @@ public class Frag2 extends Fragment {
     private String[] osan;
     private JAT_frag2 task;
 
+    private TextView os_text_color;
+    private TextView os_text_string;
+
+    private TextView ch_text_color;
+    private TextView ch_text_string;
+
+    private TextView ch_t_text_color;
+    private TextView ch_t_text_string;
+
 
     @Nullable
     @Override
@@ -38,6 +48,15 @@ public class Frag2 extends Fragment {
         osan_num = (TextView) view.findViewById(R.id.osan_num);
         cheonan_num = (TextView) view.findViewById(R.id.cheonan_num);
         cheonan_t_num = (TextView) view.findViewById(R.id.cheonan_t_num);
+
+        os_text_color = (TextView) view.findViewById(R.id.textView2);
+        os_text_string = (TextView) view.findViewById(R.id.textView3);
+
+        ch_text_color  = (TextView) view.findViewById(R.id.textView5);
+        ch_text_string = (TextView) view.findViewById(R.id.textView6);
+
+        ch_t_text_color  = (TextView) view.findViewById(R.id.textView8);
+        ch_t_text_string  = (TextView) view.findViewById(R.id.textView9);
 
         //task = new JAT_frag2();
 
@@ -168,7 +187,84 @@ public class Frag2 extends Fragment {
             cheonan_num.setText(ch[0]);
             cheonan_t_num.setText(ch_t[0]);
 
+
+            if(Integer.parseInt(String.valueOf(osan_num.getText())) < 20)
+            {
+                os_text_color.setBackgroundColor(Color.rgb(60,174,136));
+                os_text_string.setTextColor(Color.rgb(60,174,136));
+                os_text_string.setText("쾌적");
+                osan_num.setTextColor(Color.rgb(60,174,136));
+            }
+
+            if(Integer.parseInt(String.valueOf(cheonan_num.getText())) < 20)
+            {
+                ch_text_color.setBackgroundColor(Color.rgb(60,174,136));
+                ch_text_string.setTextColor(Color.rgb(60,174,136));
+                ch_text_string.setText("쾌적");
+                cheonan_num.setTextColor(Color.rgb(60,174,136));
+            }
+
+            if(Integer.parseInt(String.valueOf(cheonan_t_num.getText())) < 20)
+            {
+                ch_t_text_color.setBackgroundColor(Color.rgb(60,174,136));
+                ch_t_text_string.setTextColor(Color.rgb(60,174,136));
+                ch_t_text_string.setText("쾌적");
+                cheonan_t_num.setTextColor(Color.rgb(60,174,136));
+            }
+
+            if(Integer.parseInt(String.valueOf(osan_num.getText())) >= 20 && Integer.parseInt(String.valueOf(osan_num.getText())) < 35)
+            {
+                os_text_color.setBackgroundColor(Color.rgb(242,190,34));
+                os_text_string.setTextColor(Color.rgb(242,190,34));
+                os_text_string.setText("보통");
+                osan_num.setTextColor(Color.rgb(242,190,34));
+            }
+
+            if(Integer.parseInt(String.valueOf(cheonan_num.getText())) >= 20 && Integer.parseInt(String.valueOf(cheonan_num.getText())) < 35)
+            {
+                ch_text_color.setBackgroundColor(Color.rgb(242,190,34));
+                ch_text_string.setTextColor(Color.rgb(242,190,34));
+                ch_text_string.setText("보통");
+                cheonan_num.setTextColor(Color.rgb(242,190,34));
+            }
+
+            if(Integer.parseInt(String.valueOf(cheonan_t_num.getText())) >= 20 && Integer.parseInt(String.valueOf(cheonan_t_num.getText())) < 35)
+            {
+                ch_t_text_color.setBackgroundColor(Color.rgb(242,190,34));
+                ch_t_text_string.setTextColor(Color.rgb(242,190,34));
+                ch_t_text_string.setText("보통");
+                cheonan_t_num.setTextColor(Color.rgb(242,190,34));
+            }
+
+
+            if(Integer.parseInt(String.valueOf(osan_num.getText())) >= 35)
+            {
+                os_text_color.setBackgroundColor(Color.rgb(248, 91, 78));
+                os_text_string.setTextColor(Color.rgb(248, 91, 78));
+                os_text_string.setText("포화");
+                osan_num.setTextColor(Color.rgb(248, 91, 78));
+            }
+
+            if(Integer.parseInt(String.valueOf(cheonan_num.getText())) >= 35)
+            {
+                ch_text_color.setBackgroundColor(Color.rgb(248, 91, 78));
+                ch_text_string.setTextColor(Color.rgb(248, 91, 78));
+                ch_text_string.setText("포화");
+                cheonan_num.setTextColor(Color.rgb(248, 91, 78));
+            }
+
+            if(Integer.parseInt(String.valueOf(cheonan_t_num.getText())) >= 35)
+            {
+                ch_t_text_color.setBackgroundColor(Color.rgb(248, 91, 78));
+                ch_t_text_string.setTextColor(Color.rgb(248, 91, 78));
+                ch_t_text_string.setText("포화");
+                cheonan_t_num.setTextColor(Color.rgb(248, 91, 78));
+            }
+
+
+
         }
+
 
         @Override
         protected void onPostExecute(Void result) {
