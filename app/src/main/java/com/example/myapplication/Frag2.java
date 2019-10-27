@@ -251,6 +251,7 @@ public class Frag2 extends Fragment {
                 ch_text_string.setTextColor(Color.rgb(248, 91, 78));
                 ch_text_string.setText("포화");
                 cheonan_num.setTextColor(Color.rgb(248, 91, 78));
+                
             }
 
             if(Integer.parseInt(String.valueOf(cheonan_t_num.getText())) >= 35)
