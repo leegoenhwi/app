@@ -95,9 +95,6 @@ public class Frag3 extends Fragment {
     private JAT task;
 
 
-
-
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -125,20 +122,20 @@ public class Frag3 extends Fragment {
 //        dbhelper.createtable();
 //        task.execute();
 
-       re_swipe2();
+        re_swipe2();
 
-       current_day();
+        current_day();
 
-       check_butt(weekDay);
-       singleSelectToggleGroup2.clearCheck();
-       singleSelectToggleGroup2.check(R.id.choice_osan);
+        check_butt(weekDay);
+        singleSelectToggleGroup2.clearCheck();
+        singleSelectToggleGroup2.check(R.id.choice_osan);
 
-       scroll_log();
+        scroll_log();
 
-       db_save_arrary_list();
+        db_save_arrary_list();
 
-       day_select();
-       goal_select();
+        day_select();
+        goal_select();
 
         return view;
 
@@ -149,100 +146,26 @@ public class Frag3 extends Fragment {
 
         @Override
         protected Void doInBackground(Void... params) {
-            //제일 처음 가장 많은 열을 가지고 있는 평일 천안역 출발 행을 먼저 insert 해서 테이블 전체 틀을 만들고
-            //그 다음 행들의 값을 update로 각각의 행에 넣어줌
-            //쓰는 Arraylist와 db의 행은 day_cheonan과 cheonan_day 식으로 혼동되지 않게 다르게 구성함
-            //Asynctask이기 때문에 재실행시 오류 발생
             System.out.println("스레드 시작");
-//            long now = System.currentTimeMillis();
-//            Date date = new Date(now);
-//            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
-//            String formatDate = sdfNow.format(date);
-//            System.out.println(formatDate);
-
             try {
                 Document doc = Jsoup.connect(url_day_cheonan).get();
-                //url 페이지 가져오기
 
                 Elements table = doc.select("div.table01 td:eq(2)");
-                //특정 부분을 잘라 table 이라는 Elements로 만들기
+                Elements table3 = doc.select("div.table01 td:eq(1)");
 
                 for (Element e : table) {
-                    //그 부분의 하나하나를
                     if (!e.text().equals("X")) {
-                        //"X"와 일치하지 않을 경우에
                         String n[]=(e.text()).split("\\(");
-                        //"("로 잘라서
                         day_cheonan_rev.add(n[0]);
-                        //제일 처음 값을 Arraylist에 넣는다
-                        //이것을 하는 이유는 "(금X)"를 제거하고 사용하기 위해서 이며 "("는 split의 매개변수로 사용할 수 없으므로 split("\\(")로 사용함(검색해보면 나옴)
                     }
                 }
                 for (int i = 0; i < day_cheonan_rev.size(); i++) {
-                    //Arraylist의 갯수만큼
                     System.out.println("포문");
                     dbhelper.insert(day_cheonan_rev.get(i));
-                    //db에 값을 하나하나 insert 하여 테이블 전체 틀을 작성함
                 }
                 dbhelper.insert("end");
-                //insert의 매개변수로 "end"를 보내 마지막에 null을 넣어줌
                 System.out.println(day_cheonan_rev.size());
                 System.out.println("평일 천안 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            //여기서부터는 전부 update를 사용한다
-            try {
-                Document doc = Jsoup.connect(url_day_terminal).get();
-
-                Elements table = doc.select("div.table01 td:eq(2)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        day_terminal_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= day_terminal_rev.size(); i++) {
-                    //여기서 i가 1이고 아래의 get()안에 i-1을 넣은 이유는 Arraylist는 0부터 시작하고
-                    //db의 id값은 1부터 시작하기 때문에 이런식으로 구성함
-                    System.out.println("포문");
-                    System.out.println(day_terminal_rev.get(i-1));
-                    System.out.println(i);
-                    dbhelper.update(day_terminal_rev.get(i-1), i, "terminal_day_rev");
-                }
-                System.out.println(day_terminal_rev.size());
-                System.out.println("평일 터미널 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_day_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(2)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        day_asan_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= day_asan_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(day_asan_rev.get(i-1), i, "asan_day_rev");
-                }
-                System.out.println(day_asan_rev.size());
-                System.out.println("평일 아산 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_day_cheonan).get();
-
-                Elements table = doc.select("div.table01 td:eq(2)");
 
                 for (Element e : table) {
                     if (!e.text().contains("X")) {
@@ -255,28 +178,32 @@ public class Frag3 extends Fragment {
                     dbhelper.update(fri_cheonan_rev.get(i-1), i, "cheonan_fri_rev");
                 }
                 System.out.println(fri_cheonan_rev.size());
-                System.out.println("평일 천안 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                System.out.println("금 천안 역");
 
-            try {
-                Document doc = Jsoup.connect(url_day_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(2)");
-
-                for (Element e : table) {
-                    if (!e.text().contains("X")) {
+                for (Element e : table3) {
+                    if (!e.text().equals("X")) {
                         String n[]=(e.text()).split("\\(");
-                        fri_asan_rev.add(n[0]);
+                        day_cheonan.add(n[0]);
                     }
                 }
-                for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                for (int i = 1; i <= day_cheonan.size(); i++) {
                     System.out.println("포문");
-                    dbhelper.update(fri_asan_rev.get(i-1), i, "asan_fri_rev");
+                    dbhelper.update(day_cheonan.get(i-1), i, "cheonan_day");
                 }
-                System.out.println(fri_asan_rev.size());
-                System.out.println("금 아산 역");
+                System.out.println(day_cheonan.size());
+                System.out.println("평일 천안");
+
+                for (Element e : table3) {
+                    if (!e.text().contains("X")) {
+                        fri_cheonan.add(e.text());
+                    }
+                }
+                for (int i = 1; i <= fri_cheonan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_cheonan.get(i-1), i, "cheonan_fri");
+                }
+                System.out.println(fri_cheonan.size());
+                System.out.println("금 천안");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -285,6 +212,20 @@ public class Frag3 extends Fragment {
                 Document doc = Jsoup.connect(url_day_terminal).get();
 
                 Elements table = doc.select("div.table01 td:eq(2)");
+                Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_terminal_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_terminal_rev.get(i-1), i, "terminal_day_rev");
+                }
+                System.out.println(day_terminal_rev.size());
+                System.out.println("평일 터미널 역");
 
                 for (Element e : table) {
                     if (!e.text().contains("X")) {
@@ -298,142 +239,8 @@ public class Frag3 extends Fragment {
                 }
                 System.out.println(fri_terminal_rev.size());
                 System.out.println("금 터미널 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-            try {
-                Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(3)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        sat_cheonan_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(sat_cheonan_rev.get(i-1), i, "cheonan_sat_rev");
-                }
-                System.out.println(sat_cheonan_rev.size());
-                System.out.println("토 천안 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(4)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        sat_asan_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= sat_asan_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(sat_asan_rev.get(i-1), i, "asan_sat_rev");
-                }
-                System.out.println(sat_asan_rev.size());
-                System.out.println("토 아산 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_sat_terminal).get();
-
-                Elements table = doc.select("div.table01 td:eq(2)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        sat_terminal_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= sat_terminal_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(sat_terminal_rev.get(i-1), i, "terminal_sat_rev");
-                }
-                System.out.println(sat_terminal_rev.size());
-                System.out.println("토 터미널 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(3)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        sun_cheonan_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(sun_cheonan_rev.get(i-1), i, "cheonan_sun_rev");
-                }
-                System.out.println(sun_cheonan_rev.size());
-                System.out.println("일 천안 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(4)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        sun_asan_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= sun_asan_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(sun_asan_rev.get(i-1), i, "asan_sun_rev");
-                }
-                System.out.println(sun_asan_rev.size());
-                System.out.println("일 아산 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_sun_terminal).get();
-
-                Elements table = doc.select("div.table01 td:eq(2)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        sun_terminal_rev.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= sun_terminal_rev.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(sun_terminal_rev.get(i-1), i, "terminal_sun_rev");
-                }
-                System.out.println(sun_terminal_rev.size());
-                System.out.println("일 터미널 역");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_day_terminal).get();
-
-                Elements table = doc.select("div.table01 td:eq(1)");
-
-                for (Element e : table) {
+                for (Element e : table2) {
                     if (!e.text().equals("X")) {
                         String n[]=(e.text()).split("\\(");
                         day_terminal.add(n[0]);
@@ -445,58 +252,7 @@ public class Frag3 extends Fragment {
                 }
                 System.out.println(day_terminal.size());
                 System.out.println("평일 터미널");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_day_asan).get();
-
-                Elements table = doc.select("div.table01 td:eq(1)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        day_asan.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= day_asan.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(day_asan.get(i-1), i, "asan_day");
-                }
-                System.out.println(day_asan.size());
-                System.out.println("평일 아산");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_day_cheonan).get();
-
-                Elements table = doc.select("div.table01 td:eq(1)");
-
-                for (Element e : table) {
-                    if (!e.text().equals("X")) {
-                        String n[]=(e.text()).split("\\(");
-                        day_cheonan.add(n[0]);
-                    }
-                }
-                for (int i = 1; i <= day_cheonan.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(day_cheonan.get(i-1), i, "cheonan_day");
-                }
-                System.out.println(day_cheonan.size());
-                System.out.println("평일 천안");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Document doc = Jsoup.connect(url_day_terminal).get();
-
-                Elements table = doc.select("div.table01 td:eq(1)");
-
-                for (Element e : table) {
+                for (Element e : table2) {
                     if (!e.text().contains("X")) {
                         fri_terminal.add(e.text());
                     }
@@ -514,9 +270,49 @@ public class Frag3 extends Fragment {
             try {
                 Document doc = Jsoup.connect(url_day_asan).get();
 
-                Elements table = doc.select("div.table01 td:eq(1)");
+                Elements table = doc.select("div.table01 td:eq(2)");
+                Elements table2 = doc.select("div.table01 td:eq(1)");
 
                 for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_asan_rev.get(i-1), i, "asan_day_rev");
+                }
+                System.out.println(day_asan_rev.size());
+                System.out.println("평일 아산 역");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        fri_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_asan_rev.get(i-1), i, "asan_fri_rev");
+                }
+                System.out.println(fri_asan_rev.size());
+                System.out.println("금 아산 역");
+
+                for (Element e : table2) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_asan.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_asan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_asan.get(i-1), i, "asan_day");
+                }
+                System.out.println(day_asan.size());
+                System.out.println("평일 아산");
+
+                for (Element e : table2) {
                     if (!e.text().contains("X")) {
                         fri_asan.add(e.text());
                     }
@@ -532,31 +328,39 @@ public class Frag3 extends Fragment {
             }
 
             try {
-                Document doc = Jsoup.connect(url_day_cheonan).get();
-
-                Elements table = doc.select("div.table01 td:eq(1)");
-
-                for (Element e : table) {
-                    if (!e.text().contains("X")) {
-                        fri_cheonan.add(e.text());
-                    }
-                }
-                for (int i = 1; i <= fri_cheonan.size(); i++) {
-                    System.out.println("포문");
-                    dbhelper.update(fri_cheonan.get(i-1), i, "cheonan_fri");
-                }
-                System.out.println(fri_cheonan.size());
-                System.out.println("금 천안");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
                 Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
 
-                Elements table = doc.select("div.table01 td:eq(1)");
+                Elements table = doc.select("div.table01 td:eq(3)");
+                Elements table2 = doc.select("div.table01 td:eq(4)");
+                Elements table3 = doc.select("div.table01 td:eq(1)");
 
                 for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sat_cheonan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_cheonan_rev.get(i-1), i, "cheonan_sat_rev");
+                }
+                System.out.println(sat_cheonan_rev.size());
+                System.out.println("토 천안 역");
+
+                for (Element e : table2) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sat_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sat_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_asan_rev.get(i-1), i, "asan_sat_rev");
+                }
+                System.out.println(sat_asan_rev.size());
+                System.out.println("토 아산 역");
+
+                for (Element e : table3) {
                     sat_cheonan_asan.add(e.text());
                 }
                 for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
@@ -572,9 +376,23 @@ public class Frag3 extends Fragment {
             try {
                 Document doc = Jsoup.connect(url_sat_terminal).get();
 
-                Elements table = doc.select("div.table01 td:eq(1)");
+                Elements table = doc.select("div.table01 td:eq(2)");
+                Elements table2 = doc.select("div.table01 td:eq(1)");
 
                 for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sat_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sat_terminal_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_terminal_rev.get(i-1), i, "terminal_sat_rev");
+                }
+                System.out.println(sat_terminal_rev.size());
+                System.out.println("토 터미널 역");
+
+                for (Element e : table2) {
                     sat_terminal.add(e.text());
                 }
                 for (int i = 1; i <= sat_terminal.size(); i++) {
@@ -590,9 +408,37 @@ public class Frag3 extends Fragment {
             try {
                 Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
 
-                Elements table = doc.select("div.table01 td:eq(1)");
+                Elements table = doc.select("div.table01 td:eq(3)");
+                Elements table2 = doc.select("div.table01 td:eq(4)");
+                Elements table3 = doc.select("div.table01 td:eq(1)");
 
                 for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sun_cheonan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_cheonan_rev.get(i-1), i, "cheonan_sun_rev");
+                }
+                System.out.println(sun_cheonan_rev.size());
+                System.out.println("일 천안 역");
+
+                for (Element e : table2) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sun_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sun_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_asan_rev.get(i-1), i, "asan_sun_rev");
+                }
+                System.out.println(sun_asan_rev.size());
+                System.out.println("일 아산 역");
+
+                for (Element e : table3) {
                     sun_cheonan_asan.add(e.text());
                 }
                 for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
@@ -608,9 +454,23 @@ public class Frag3 extends Fragment {
             try {
                 Document doc = Jsoup.connect(url_sun_terminal).get();
 
-                Elements table = doc.select("div.table01 td:eq(1)");
+                Elements table = doc.select("div.table01 td:eq(2)");
+                Elements table2 = doc.select("div.table01 td:eq(1)");
 
                 for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sun_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sun_terminal_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_terminal_rev.get(i-1), i, "terminal_sun_rev");
+                }
+                System.out.println(sun_terminal_rev.size());
+                System.out.println("일 터미널 역");
+
+                for (Element e : table2) {
                     sun_terminal.add(e.text());
                 }
                 for (int i = 1; i <= sun_terminal.size(); i++) {
@@ -623,21 +483,13 @@ public class Frag3 extends Fragment {
                 e.printStackTrace();
             }
 
-
-//            long now1 = System.currentTimeMillis();
-//            Date date1 = new Date(now1);
-//            SimpleDateFormat sdfNow1 = new SimpleDateFormat("HH:mm:ss");
-//            String formatDate1 = sdfNow1.format(date1);
-            System.out.println("스레드 종료");
-//            System.out.println(formatDate1);
             return null;
         }
     }
 
 
     //db데이터를 arraylist에 저장
-    private void db_save_arrary_list()
-    {
+    private void db_save_arrary_list() {
         for (int column = 1; column < 23; column++) {
             //22개의 Arraylist에 모두 값을 넣어준다 column은 x좌표, id는 y좌표로 생각하면 편함
             for (int id = 1; !dbhelper.read(id, column).equals("end"); id++) {
@@ -693,9 +545,8 @@ public class Frag3 extends Fragment {
         }
     }
 
-    
-    public void scroll_log()
-    {
+
+    public void scroll_log() {
         scrollView_start.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
@@ -708,17 +559,17 @@ public class Frag3 extends Fragment {
     }
 
     //당겨서 새로고침
-    public void re_swipe2()
-    {
+    public void re_swipe2() {
         refresh_Layout3.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
 
                 new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
 
-                       current_day();
-                       check_butt(weekDay);
+                        current_day();
+                        check_butt(weekDay);
 
                         refresh_Layout3.setRefreshing(false);
                     }
@@ -729,8 +580,7 @@ public class Frag3 extends Fragment {
     }
 
     //목적지 선택
-    public void goal_select()
-    {
+    public void goal_select() {
 
         singleSelectToggleGroup2.setOnCheckedChangeListener(new SingleSelectToggleGroup.OnCheckedChangeListener() {
             @Override
@@ -742,40 +592,28 @@ public class Frag3 extends Fragment {
                 scroll_vertical_layout1.removeAllViews();
                 scroll_vertical_layout2.removeAllViews();
 
-                if(!empty_array1.isEmpty())
-                {
+                if (!empty_array1.isEmpty()) {
                     empty_array1.clear();
                 }
 
-                if(!empty_array2.isEmpty())
-                {
+                if (!empty_array2.isEmpty()) {
                     empty_array2.clear();
                 }
 
 
-                switch (checkedId){
+                switch (checkedId) {
                     case R.id.choice_osan:
 
-                        if(singleSelectToggleGroup.getCheckedId() == R.id.choice_e)
-                        {
+                        if (singleSelectToggleGroup.getCheckedId() == R.id.choice_e) {
                             empty_array1.addAll(fri_asan);
                             empty_array2.addAll(fri_asan_rev);
-                        }
-
-                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_f)
-                        {
+                        } else if (singleSelectToggleGroup.getCheckedId() == R.id.choice_f) {
                             empty_array1.addAll(sat_cheonan_asan);
                             empty_array2.addAll(sat_asan_rev);
-                        }
-
-                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_g)
-                        {
+                        } else if (singleSelectToggleGroup.getCheckedId() == R.id.choice_g) {
                             empty_array1.addAll(sun_cheonan_asan);
                             empty_array2.addAll(sun_asan_rev);
-                        }
-
-                        else
-                        {
+                        } else {
                             empty_array1.addAll(day_asan);
                             empty_array2.addAll(day_asan_rev);
                         }
@@ -786,24 +624,22 @@ public class Frag3 extends Fragment {
                         textViews1 = new TextView[Textview_num1];
                         textViews2 = new TextView[Textview_num2];
 
-                        for(int i = 0;i<Textview_num1;i++)
-                        {
+                        for (int i = 0; i < Textview_num1; i++) {
                             textViews1[i] = new TextView(getActivity());
                             textViews1[i].setText(empty_array1.get(i));
                             textViews1[i].setGravity(Gravity.CENTER);
-                            textViews1[i].setTextColor(Color.rgb(169,169,169));
+                            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                             textViews1[i].setTextSize(25);
                             textViews1[i].setHeight(190);
 
                             scroll_vertical_layout1.addView(textViews1[i]);
                         }
 
-                        for(int i = 0;i<Textview_num2;i++)
-                        {
+                        for (int i = 0; i < Textview_num2; i++) {
                             textViews2[i] = new TextView(getActivity());
                             textViews2[i].setText(empty_array2.get(i));
                             textViews2[i].setGravity(Gravity.CENTER);
-                            textViews2[i].setTextColor(Color.rgb(169,169,169));
+                            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                             textViews2[i].setTextSize(25);
                             textViews2[i].setHeight(190);
 
@@ -811,47 +647,34 @@ public class Frag3 extends Fragment {
                         }
 
 
-                        if(singleSelectToggleGroup.getCheckedId() ==   curr_Day)
-                       {
-                           int x = current_time(empty_array1);
-                           textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                           scroll_vertical_layout1.removeViewAt(x);
-                           scroll_vertical_layout1.addView( textViews1[x],x);
+                        if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
+                            int x = current_time(empty_array1);
+                            textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                            scroll_vertical_layout1.removeViewAt(x);
+                            scroll_vertical_layout1.addView(textViews1[x], x);
 
-                           int y = current_time(empty_array2);
-                           textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                           scroll_vertical_layout2.removeViewAt(y);
-                           scroll_vertical_layout2.addView( textViews2[y],y);
+                            int y = current_time(empty_array2);
+                            textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                            scroll_vertical_layout2.removeViewAt(y);
+                            scroll_vertical_layout2.addView(textViews2[y], y);
 
-                           scroll_ani(x,y);
-                       }
-                        else
-                        {
+                            scroll_ani(x, y);
+                        } else {
                             scroll_set();
                         }
                         break;
                     case R.id.choice_Cheonan:
 
-                        if(singleSelectToggleGroup.getCheckedId() == R.id.choice_e)
-                        {
+                        if (singleSelectToggleGroup.getCheckedId() == R.id.choice_e) {
                             empty_array1.addAll(fri_cheonan);
                             empty_array2.addAll(fri_cheonan_rev);
-                        }
-
-                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_f)
-                        {
+                        } else if (singleSelectToggleGroup.getCheckedId() == R.id.choice_f) {
                             empty_array1.addAll(sat_cheonan_asan);
                             empty_array2.addAll(sat_cheonan_rev);
-                        }
-
-                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_g)
-                        {
+                        } else if (singleSelectToggleGroup.getCheckedId() == R.id.choice_g) {
                             empty_array1.addAll(sun_cheonan_asan);
                             empty_array2.addAll(sun_cheonan_rev);
-                        }
-
-                        else
-                        {
+                        } else {
                             empty_array1.addAll(day_cheonan);
                             empty_array2.addAll(day_cheonan_rev);
                         }
@@ -862,70 +685,55 @@ public class Frag3 extends Fragment {
                         textViews1 = new TextView[Textview_num3];
                         textViews2 = new TextView[Textview_num4];
 
-                        for(int i = 0;i<Textview_num3;i++)
-                        {
+                        for (int i = 0; i < Textview_num3; i++) {
                             textViews1[i] = new TextView(getActivity());
                             textViews1[i].setText(empty_array1.get(i));
                             textViews1[i].setGravity(Gravity.CENTER);
-                            textViews1[i].setTextColor(Color.rgb(169,169,169));
+                            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                             textViews1[i].setTextSize(25);
                             textViews1[i].setHeight(190);
 
                             scroll_vertical_layout1.addView(textViews1[i]);
                         }
 
-                        for(int i = 0;i<Textview_num4;i++)
-                        {
+                        for (int i = 0; i < Textview_num4; i++) {
                             textViews2[i] = new TextView(getActivity());
                             textViews2[i].setText(empty_array2.get(i));
                             textViews2[i].setGravity(Gravity.CENTER);
-                            textViews2[i].setTextColor(Color.rgb(169,169,169));
+                            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                             textViews2[i].setTextSize(25);
                             textViews2[i].setHeight(190);
 
                             scroll_vertical_layout2.addView(textViews2[i]);
                         }
-                        if(singleSelectToggleGroup.getCheckedId() ==  curr_Day)
-                        {
+                        if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
                             textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                             scroll_vertical_layout1.removeViewAt(x);
-                            scroll_vertical_layout1.addView( textViews1[x],x);
+                            scroll_vertical_layout1.addView(textViews1[x], x);
 
                             int y = current_time(empty_array2);
                             textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                             scroll_vertical_layout2.removeViewAt(y);
-                            scroll_vertical_layout2.addView( textViews2[y],y);
+                            scroll_vertical_layout2.addView(textViews2[y], y);
 
-                            scroll_ani(x,y);
-                        }
-                        else
-                        {
+                            scroll_ani(x, y);
+                        } else {
                             scroll_set();
                         }
                         break;
                     case R.id.choice_Cheonan_terminal:
 
-                        if(singleSelectToggleGroup.getCheckedId() == R.id.choice_e)
-                        {
+                        if (singleSelectToggleGroup.getCheckedId() == R.id.choice_e) {
                             empty_array1.addAll(fri_terminal);
                             empty_array2.addAll(fri_terminal_rev);
-                        }
-
-                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_f)
-                        {
+                        } else if (singleSelectToggleGroup.getCheckedId() == R.id.choice_f) {
                             empty_array1.addAll(sat_terminal);
                             empty_array2.addAll(sat_terminal_rev);
-                        }
-
-                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_g)
-                        {
+                        } else if (singleSelectToggleGroup.getCheckedId() == R.id.choice_g) {
                             empty_array1.addAll(sun_terminal);
                             empty_array2.addAll(sun_terminal_rev);
-                        }
-
-                        else
-                        {
+                        } else {
                             empty_array1.addAll(day_terminal);
                             empty_array2.addAll(day_terminal_rev);
                         }
@@ -936,24 +744,22 @@ public class Frag3 extends Fragment {
                         textViews1 = new TextView[Textview_num5];
                         textViews2 = new TextView[Textview_num6];
 
-                        for(int i = 0;i<Textview_num5;i++)
-                        {
+                        for (int i = 0; i < Textview_num5; i++) {
                             textViews1[i] = new TextView(getActivity());
                             textViews1[i].setText(empty_array1.get(i));
                             textViews1[i].setGravity(Gravity.CENTER);
-                            textViews1[i].setTextColor(Color.rgb(169,169,169));
+                            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                             textViews1[i].setTextSize(25);
                             textViews1[i].setHeight(190);
 
                             scroll_vertical_layout1.addView(textViews1[i]);
                         }
 
-                        for(int i = 0;i<Textview_num6;i++)
-                        {
+                        for (int i = 0; i < Textview_num6; i++) {
                             textViews2[i] = new TextView(getActivity());
                             textViews2[i].setText(empty_array2.get(i));
                             textViews2[i].setGravity(Gravity.CENTER);
-                            textViews2[i].setTextColor(Color.rgb(169,169,169));
+                            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                             textViews2[i].setTextSize(25);
                             textViews2[i].setHeight(190);
 
@@ -961,22 +767,19 @@ public class Frag3 extends Fragment {
                         }
 
 
-                        if(singleSelectToggleGroup.getCheckedId() == curr_Day)
-                        {
+                        if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
                             textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                             scroll_vertical_layout1.removeViewAt(x);
-                            scroll_vertical_layout1.addView( textViews1[x],x);
+                            scroll_vertical_layout1.addView(textViews1[x], x);
 
                             int y = current_time(empty_array2);
                             textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                             scroll_vertical_layout2.removeViewAt(y);
-                            scroll_vertical_layout2.addView( textViews2[y],y);
+                            scroll_vertical_layout2.addView(textViews2[y], y);
 
-                            scroll_ani(x,y);
-                        }
-                        else
-                        {
+                            scroll_ani(x, y);
+                        } else {
                             scroll_set();
                         }
                         break;
@@ -986,35 +789,33 @@ public class Frag3 extends Fragment {
     }
 
     //리스트 초기화
-    public void array_reset()
-    {
-       day_asan.clear();
-       day_asan_rev.clear();
-       day_cheonan.clear();
-       day_cheonan_rev.clear();
-       day_terminal.clear();
-       day_terminal_rev.clear();
-       fri_asan.clear();
-       fri_asan_rev.clear();
-       fri_cheonan.clear();
-       fri_cheonan_rev.clear();
-       fri_terminal.clear();
-       fri_terminal_rev.clear();
-       sat_asan_rev.clear();
-       sat_cheonan_asan.clear();
-       sat_cheonan_rev.clear();
-       sat_terminal.clear();
-       sat_terminal_rev.clear();
-       sun_asan_rev.clear();
-       sun_cheonan_asan.clear();
-       sun_cheonan_rev.clear();
-       sun_terminal.clear();
-       sun_terminal_rev.clear();
+    public void array_reset() {
+        day_asan.clear();
+        day_asan_rev.clear();
+        day_cheonan.clear();
+        day_cheonan_rev.clear();
+        day_terminal.clear();
+        day_terminal_rev.clear();
+        fri_asan.clear();
+        fri_asan_rev.clear();
+        fri_cheonan.clear();
+        fri_cheonan_rev.clear();
+        fri_terminal.clear();
+        fri_terminal_rev.clear();
+        sat_asan_rev.clear();
+        sat_cheonan_asan.clear();
+        sat_cheonan_rev.clear();
+        sat_terminal.clear();
+        sat_terminal_rev.clear();
+        sun_asan_rev.clear();
+        sun_cheonan_asan.clear();
+        sun_cheonan_rev.clear();
+        sun_terminal.clear();
+        sun_terminal_rev.clear();
     }
 
     //요일 선택
-    public void day_select()
-    {
+    public void day_select() {
         singleSelectToggleGroup.setOnCheckedChangeListener(new SingleSelectToggleGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SingleSelectToggleGroup group, int checkedId) {
@@ -1028,32 +829,26 @@ public class Frag3 extends Fragment {
                 scroll_vertical_layout1.removeAllViews();
                 scroll_vertical_layout2.removeAllViews();
 
-                if(!empty_array3.isEmpty())
-                {
+                if (!empty_array3.isEmpty()) {
                     empty_array3.clear();
                 }
 
-                if(!empty_array4.isEmpty())
-                {
+                if (!empty_array4.isEmpty()) {
                     empty_array4.clear();
                 }
 
-                if( (checkedId == R.id.choice_a))
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if ((checkedId == R.id.choice_a)) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(day_asan);
                         empty_array4.addAll(day_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(day_cheonan);
                         empty_array4.addAll(day_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(day_terminal);
                         empty_array4.addAll(day_terminal_rev);
                     }
@@ -1064,66 +859,57 @@ public class Frag3 extends Fragment {
                     textViews1 = new TextView[Textview_num3];
                     textViews2 = new TextView[Textview_num4];
 
-                    for(int i = 0;i<Textview_num3;i++)
-                    {
+                    for (int i = 0; i < Textview_num3; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num4;i++)
-                    {
+                    for (int i = 0; i < Textview_num4; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_a == curr_Day)
-                    {
+                    if (R.id.choice_a == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
-                    }
-                    else
-                    {
+                        scroll_ani(x, y);
+                    } else {
                         scroll_set();
                     }
 
                 }
-                if( (checkedId == R.id.choice_b))
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if ((checkedId == R.id.choice_b)) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(day_asan);
                         empty_array4.addAll(day_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(day_cheonan);
                         empty_array4.addAll(day_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(day_terminal);
                         empty_array4.addAll(day_terminal_rev);
                     }
@@ -1134,66 +920,57 @@ public class Frag3 extends Fragment {
                     textViews1 = new TextView[Textview_num1];
                     textViews2 = new TextView[Textview_num2];
 
-                    for(int i = 0;i<Textview_num1;i++)
-                    {
+                    for (int i = 0; i < Textview_num1; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num2;i++)
-                    {
+                    for (int i = 0; i < Textview_num2; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_b == curr_Day)
-                    {
+                    if (R.id.choice_b == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
-                    }
-                    else
-                    {
+                        scroll_ani(x, y);
+                    } else {
                         scroll_set();
                     }
 
                 }
-                if( (checkedId == R.id.choice_c))
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if ((checkedId == R.id.choice_c)) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(day_asan);
                         empty_array4.addAll(day_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(day_cheonan);
                         empty_array4.addAll(day_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(day_terminal);
                         empty_array4.addAll(day_terminal_rev);
                     }
@@ -1204,65 +981,56 @@ public class Frag3 extends Fragment {
                     textViews1 = new TextView[Textview_num1];
                     textViews2 = new TextView[Textview_num2];
 
-                    for(int i = 0;i<Textview_num1;i++)
-                    {
+                    for (int i = 0; i < Textview_num1; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num2;i++)
-                    {
+                    for (int i = 0; i < Textview_num2; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_c == curr_Day)
-                    {
+                    if (R.id.choice_c == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
-                    }
-                    else
-                    {
+                        scroll_ani(x, y);
+                    } else {
                         scroll_set();
                     }
                 }
-                if( (checkedId == R.id.choice_d))
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if ((checkedId == R.id.choice_d)) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(day_asan);
                         empty_array4.addAll(day_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(day_cheonan);
                         empty_array4.addAll(day_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(day_terminal);
                         empty_array4.addAll(day_terminal_rev);
                     }
@@ -1273,65 +1041,56 @@ public class Frag3 extends Fragment {
                     textViews1 = new TextView[Textview_num1];
                     textViews2 = new TextView[Textview_num2];
 
-                    for(int i = 0;i<Textview_num1;i++)
-                    {
+                    for (int i = 0; i < Textview_num1; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num2;i++)
-                    {
+                    for (int i = 0; i < Textview_num2; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_d == curr_Day)
-                    {
+                    if (R.id.choice_d == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
-                    }
-                    else
-                    {
+                        scroll_ani(x, y);
+                    } else {
                         scroll_set();
                     }
                 }
-                if(checkedId == R.id.choice_e)
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if (checkedId == R.id.choice_e) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(fri_asan);
                         empty_array4.addAll(fri_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(fri_cheonan);
                         empty_array4.addAll(fri_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(fri_terminal);
                         empty_array4.addAll(fri_terminal_rev);
                     }
@@ -1342,66 +1101,57 @@ public class Frag3 extends Fragment {
                     textViews1 = new TextView[Textview_num1];
                     textViews2 = new TextView[Textview_num2];
 
-                    for(int i = 0;i<Textview_num1;i++)
-                    {
+                    for (int i = 0; i < Textview_num1; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num2;i++)
-                    {
+                    for (int i = 0; i < Textview_num2; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_e == curr_Day)
-                    {
+                    if (R.id.choice_e == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
-                    }
-                    else
-                    {
+                        scroll_ani(x, y);
+                    } else {
                         scroll_set();
                     }
 
                 }
-                if(checkedId == R.id.choice_f)
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if (checkedId == R.id.choice_f) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(sat_cheonan_asan);
                         empty_array4.addAll(sat_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(sat_cheonan_asan);
                         empty_array4.addAll(sat_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(sat_terminal);
                         empty_array4.addAll(sat_terminal_rev);
                     }
@@ -1412,65 +1162,56 @@ public class Frag3 extends Fragment {
                     textViews1 = new TextView[Textview_num1];
                     textViews2 = new TextView[Textview_num2];
 
-                    for(int i = 0;i<Textview_num1;i++)
-                    {
+                    for (int i = 0; i < Textview_num1; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num2;i++)
-                    {
+                    for (int i = 0; i < Textview_num2; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_f == curr_Day)
-                    {
+                    if (R.id.choice_f == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
-                    }
-                    else
-                    {
+                        scroll_ani(x, y);
+                    } else {
                         scroll_set();
                     }
                 }
-                if(checkedId == R.id.choice_g)
-                {
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
-                    {
+                if (checkedId == R.id.choice_g) {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan) {
                         empty_array3.addAll(sun_cheonan_asan);
                         empty_array4.addAll(sun_asan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan) {
                         empty_array3.addAll(sun_cheonan_asan);
                         empty_array4.addAll(sun_cheonan_rev);
                     }
 
-                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
-                    {
+                    if (singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal) {
                         empty_array3.addAll(sun_terminal);
                         empty_array4.addAll(sun_terminal_rev);
                     }
@@ -1482,48 +1223,42 @@ public class Frag3 extends Fragment {
                     textViews2 = new TextView[Textview_num2];
 
 
-
-                    for(int i = 0;i<Textview_num1;i++)
-                    {
+                    for (int i = 0; i < Textview_num1; i++) {
                         textViews1[i] = new TextView(getActivity());
                         textViews1[i].setText(empty_array3.get(i));
                         textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews1[i].setTextSize(25);
                         textViews1[i].setHeight(190);
 
                         scroll_vertical_layout1.addView(textViews1[i]);
                     }
 
-                    for(int i = 0;i<Textview_num2;i++)
-                    {
+                    for (int i = 0; i < Textview_num2; i++) {
                         textViews2[i] = new TextView(getActivity());
                         textViews2[i].setText(empty_array4.get(i));
                         textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
                         textViews2[i].setTextSize(25);
                         textViews2[i].setHeight(190);
 
                         scroll_vertical_layout2.addView(textViews2[i]);
                     }
 
-                    if(R.id.choice_g == curr_Day)
-                    {
+                    if (R.id.choice_g == curr_Day) {
                         int x = current_time(empty_array3);
                         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView( textViews1[x],x);
+                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
                         textViews2[y].setTextColor(Color.rgb(248, 91, 78));
                         scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView( textViews2[y],y);
+                        scroll_vertical_layout2.addView(textViews2[y], y);
 
-                        scroll_ani(x,y);
+                        scroll_ani(x, y);
 
-                    }
-                    else
-                    {
+                    } else {
                         scroll_set();
                     }
 
@@ -1535,18 +1270,17 @@ public class Frag3 extends Fragment {
     }
 
     //스크롤 애니
-    public void scroll_ani(final int x,final int y)
-    {
+    public void scroll_ani(final int x, final int y) {
         scrollView_start.post(new Runnable() {
             @Override
             public void run() {
 
-                scrollView_start.scrollTo(0,0);
-                scrollView_arrive.scrollTo(0,0);
+                scrollView_start.scrollTo(0, 0);
+                scrollView_arrive.scrollTo(0, 0);
                 //index가 2보다 클경우
-                ObjectAnimator.ofInt(scrollView_start, "scrollY", (x - 2) *190).setDuration(250).start();
+                ObjectAnimator.ofInt(scrollView_start, "scrollY", (x - 2) * 190).setDuration(250).start();
 
-                ObjectAnimator.ofInt(scrollView_arrive, "scrollY", (y - 2) *190).setDuration(250).start();
+                ObjectAnimator.ofInt(scrollView_arrive, "scrollY", (y - 2) * 190).setDuration(250).start();
             }
         });
 
@@ -1570,12 +1304,11 @@ public class Frag3 extends Fragment {
         System.out.println("온퓨즈");
 
 
-
         super.onPause();
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
 
         array_reset();
 
@@ -1583,68 +1316,52 @@ public class Frag3 extends Fragment {
     }
 
     //현재 요일은 반환하는 함수
-    private void current_day()
-    {
+    private void current_day() {
         //현재 요일
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat weekdayFormat = new SimpleDateFormat("EE", Locale.KOREA);
-       weekDay = weekdayFormat.format(currentTime);
+        weekDay = weekdayFormat.format(currentTime);
 
     }
 
     //스크롤 초기화
-    private void scroll_set()
-    {
+    private void scroll_set() {
 
         scrollView_start.post(new Runnable() {
             @Override
             public void run() {
 
-                scrollView_start.scrollTo(0,0);
-                scrollView_arrive.scrollTo(0,0);
+                scrollView_start.scrollTo(0, 0);
+                scrollView_arrive.scrollTo(0, 0);
             }
         });
 
     }
 
     //현재 요일로 버튼 셋
-    private void check_butt(String day)
-    {
+    private void check_butt(String day) {
 
         singleSelectToggleGroup.clearCheck();
 
-        if(day.equals("월"))
-        {
+        if (day.equals("월")) {
             singleSelectToggleGroup.check(R.id.choice_a);
             curr_Day = R.id.choice_a;
-        }
-        else if(day.equals("화"))
-        {
+        } else if (day.equals("화")) {
             singleSelectToggleGroup.check(R.id.choice_b);
             curr_Day = R.id.choice_b;
-        }
-        else if(day.equals("수"))
-        {
+        } else if (day.equals("수")) {
             singleSelectToggleGroup.check(R.id.choice_c);
             curr_Day = R.id.choice_c;
-        }
-        else if(day.equals("목"))
-        {
+        } else if (day.equals("목")) {
             singleSelectToggleGroup.check(R.id.choice_d);
             curr_Day = R.id.choice_d;
-        }
-        else if(day.equals("금"))
-        {
+        } else if (day.equals("금")) {
             singleSelectToggleGroup.check(R.id.choice_e);
             curr_Day = R.id.choice_e;
-        }
-        else if(day.equals("토"))
-        {
+        } else if (day.equals("토")) {
             singleSelectToggleGroup.check(R.id.choice_f);
             curr_Day = R.id.choice_f;
-        }
-        else if(day.equals("일"))
-        {
+        } else if (day.equals("일")) {
             singleSelectToggleGroup.check(R.id.choice_g);
             curr_Day = R.id.choice_g;
         }
@@ -1652,8 +1369,7 @@ public class Frag3 extends Fragment {
     }
 
 
-    public int current_time(ArrayList<String> arrayList)
-    {
+    public int current_time(ArrayList<String> arrayList) {
         int i = 0;
         Date startDate = null;
         Date endDate = null;
@@ -1669,7 +1385,7 @@ public class Frag3 extends Fragment {
 
         //--현재시간과 셔틀 시간 비교
         while (true) {
-            if (i > (arrayList.size() -1)) {
+            if (i > (arrayList.size() - 1)) {
                 i = 0;
                 break;
             }
@@ -1691,7 +1407,6 @@ public class Frag3 extends Fragment {
 
         return i;
     }
-
 
 
 }

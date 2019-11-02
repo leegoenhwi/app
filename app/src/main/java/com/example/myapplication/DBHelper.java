@@ -74,6 +74,17 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE SQLITE (id INTEGER PRIMARY KEY AUTOINCREMENT, cheonan_day_rev TEXT, terminal_day_rev TEXT, asan_day_rev TEXT, cheonan_fri_rev TEXT, asan_fri_rev TEXT, terminal_fri_rev TEXT, cheonan_sat_rev TEXT, asan_sat_rev TEXT, terminal_sat_rev TEXT, cheonan_sun_rev TEXT, asan_sun_rev TEXT, terminal_sun_rev TEXT, terminal_day TEXT, asan_day TEXT, cheonan_day TEXT, terminal_fri TEXT, asan_fri TEXT, cheonan_fri TEXT, cheonan_asan_sat TEXT, terminal_sat TEXT, cheonan_asan_sun TEXT, terminal_sun TEXT);");
     }
 
+    public boolean table_exists(){
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name = 'SQLITE'",null);
+        cursor.moveToFirst();
+        if(cursor.getCount()>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public void droptable() {
         //db의 테이블이 존재하면 삭제시킴
         System.out.println("드랍 테이블");
