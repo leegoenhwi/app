@@ -168,11 +168,15 @@ public class Frag3 extends Fragment {
 
             System.out.println("스레드 시작");
             System.out.println(dbhelper.read_boolean());
-
-            if((!dbhelper.table_exists()) || dbhelper.read_boolean()!="true"){
-
+            System.out.println(dbhelper.table_exists());
+            System.out.println(dbhelper.read_boolean().equals("true") && dbhelper.table_exists());
+            if (dbhelper.read_boolean().equals("true") && dbhelper.table_exists()) {
+                db_save_arrary_list();
+            } else {
                 System.out.println("크롤링 시작");
-                dbhelper.droptable();
+                if (dbhelper.table_exists()) {
+                    dbhelper.droptable();
+                }
                 dbhelper.createtable();
 
                 try {
@@ -512,10 +516,6 @@ public class Frag3 extends Fragment {
                 }
             }
 
-            else {
-                db_save_arrary_list();
-            }
-
 
             //측정 종료
 //            long now1 = System.currentTimeMillis();
@@ -523,9 +523,10 @@ public class Frag3 extends Fragment {
 //            SimpleDateFormat sdfNow1 = new SimpleDateFormat("HH:mm:ss");
 //            String formatDate1 = sdfNow1.format(date1);
 //            System.out.println(formatDate1);
-
+            System.out.println(dbhelper.read_boolean());
+            dbhelper.true_boolean();
+            System.out.println(dbhelper.read_boolean());
             System.out.println("쓰레드 종료");
-
 
 
             return null;
@@ -548,7 +549,6 @@ public class Frag3 extends Fragment {
         }
 
     }
-
 
 
     //db데이터를 arraylist에 저장

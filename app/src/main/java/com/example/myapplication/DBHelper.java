@@ -108,7 +108,7 @@ public class DBHelper extends SQLiteOpenHelper {
         //db의 테이블이 존재하면 삭제시킴
         System.out.println("드랍 테이블");
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DROP TABLE IF EXISTS SQLITE;");
+        db.execSQL("DROP TABLE SQLITE;");
         db.close();
     }
 
