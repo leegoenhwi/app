@@ -92,7 +92,7 @@ public class Frag3 extends Fragment {
     private DBHelper dbhelper;
     //dbhelper클래스에 있는 메소드를 이용하여 db에 여러가지 접근이 가능하다
 
-
+    private ProgressDialog asyncDialog;
 
     private JAT task;
 
@@ -118,7 +118,10 @@ public class Frag3 extends Fragment {
         scroll_vertical_layout1 = (LinearLayout) view.findViewById(R.id.scroll_vertical_layout1);
         scroll_vertical_layout2 = (LinearLayout) view.findViewById(R.id.scroll_vertical_layout2);
 
-
+        asyncDialog = new ProgressDialog(view.getContext());
+        asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        asyncDialog.setMessage("loading...");
+        asyncDialog.setCanceledOnTouchOutside(false);
 
         task = new JAT();
         task.execute();
@@ -141,24 +144,20 @@ public class Frag3 extends Fragment {
     }
 
     //스레드 크롤링
-    private class JAT extends AsyncTask<String, Void, String> {
+    private class JAT extends AsyncTask<Void, Void, Void> {
 
-        ProgressDialog asyncDialog = new ProgressDialog(view.getContext());
 
         @Override
         protected void onPreExecute() {
-            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("loading...");
-            asyncDialog.setCanceledOnTouchOutside(false);
+
             asyncDialog.show();
 
             super.onPreExecute();
         }
 
         @Override
-        protected String doInBackground(String... strings) {
+        protected Void doInBackground(Void... strings) {
 
-            String abc = "Parsing & Download OK!!!";
 
             //시간 측청
 //            long now = System.currentTimeMillis();
@@ -172,6 +171,7 @@ public class Frag3 extends Fragment {
 
             if(!dbhelper.table_exists()){
 
+                System.out.println("크롤링 시작");
                 dbhelper.createtable();
 
                 try {
@@ -524,12 +524,12 @@ public class Frag3 extends Fragment {
             System.out.println("쓰레드 종료");
 
 
-            return abc;
+            return null;
         }
 
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(Void s) {
 
             super.onPostExecute(s);
 
