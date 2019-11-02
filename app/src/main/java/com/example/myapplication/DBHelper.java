@@ -21,6 +21,8 @@ public class DBHelper extends SQLiteOpenHelper {
         //db 생성시 한번만 실행 id 값은 행을 추가하면 자동으로 증가하는 프라이머리 키, 테이블 이름은 SQLITE임
         //그러나 db가 아닌 테이블을 삭제하고 다시 생성하여 사용할 경우엔 별 의미 없음
         System.out.println("db 생성");
+        db.execSQL("CREATE TABLE BOOLEAN (id INTEGER PRIMARY KEY AUTOINCREMENT, boolean TEXT);");
+        db.execSQL("INSERT INTO BOOLEAN VALUES(null,'" + false + "');");
         //db.execSQL("CREATE TABLE SQLITE (id INTEGER PRIMARY KEY AUTOINCREMENT, cheonan_day_rev TEXT, terminal_day_rev TEXT, asan_day_rev TEXT, cheonan_fri_rev TEXT, asan_fri_rev TEXT, terminal_fri_rev TEXT, cheonan_sat_rev TEXT, asan_sat_rev TEXT, terminal_sat_rev TEXT, cheonan_sun_rev TEXT, asan_sun_rev TEXT, terminal_sun_rev TEXT, terminal_day TEXT, asan_day TEXT, cheonan_day TEXT, terminal_fri TEXT, asan_fri TEXT, cheonan_fri TEXT, cheonan_asan_sat TEXT, terminal_sat TEXT, cheonan_asan_sun TEXT, terminal_sun TEXT);");
     }
 
@@ -83,6 +85,23 @@ public class DBHelper extends SQLiteOpenHelper {
         }else{
             return false;
         }
+    }
+
+    public void true_boolean(){
+        System.out.println("진실 불렌");
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("UPDATE BOOLEAN SET boolean = '"+true+"' WHERE id=1;");
+    }
+
+    public String read_boolean(){
+        System.out.println("불렌 읽기");
+        String result = "";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor;
+        cursor = db.rawQuery("SELECT * FROM BOOLEAN WHERE id=1",null);
+        cursor.moveToFirst();
+        result +=cursor.getString(1);
+        return result;
     }
 
     public void droptable() {

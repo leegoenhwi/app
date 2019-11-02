@@ -167,10 +167,12 @@ public class Frag3 extends Fragment {
 
 
             System.out.println("스레드 시작");
+            System.out.println(dbhelper.read_boolean());
 
-            if((!dbhelper.table_exists())){
+            if((!dbhelper.table_exists()) || dbhelper.read_boolean()!="true"){
 
                 System.out.println("크롤링 시작");
+                dbhelper.droptable();
                 dbhelper.createtable();
 
                 try {
@@ -525,6 +527,7 @@ public class Frag3 extends Fragment {
             System.out.println("쓰레드 종료");
 
 
+
             return null;
         }
 
@@ -541,6 +544,7 @@ public class Frag3 extends Fragment {
             singleSelectToggleGroup2.check(R.id.choice_osan);
             day_select();
             goal_select();
+
         }
 
     }
