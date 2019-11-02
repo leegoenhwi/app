@@ -1,8 +1,12 @@
 package com.example.myapplication;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -96,6 +100,10 @@ public class Frag3 extends Fragment {
 
     private JAT task;
 
+    public static final int TYPE_WIFI = 1;
+    public static final int TYPE_MOBILE = 2;
+    public static final int TYPE_NOT_CONNECTED = 3;
+
 
     @Nullable
     @Override
@@ -143,6 +151,23 @@ public class Frag3 extends Fragment {
 
     }
 
+    //인터넷 연결상태 확인
+    private static int getConnectivityStatus(Context context){ //해당 context의 서비스를 사용하기위해서 context객체를 받는다.
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if(networkInfo != null){
+            int type = networkInfo.getType();
+            if(type == ConnectivityManager.TYPE_MOBILE){//쓰리지나 LTE로 연결된것(모바일을 뜻한다.)
+                return TYPE_MOBILE;
+            }else if(type == ConnectivityManager.TYPE_WIFI){//와이파이 연결된것
+                return TYPE_WIFI;
+            }
+        }
+        return TYPE_NOT_CONNECTED;  //연결이 되지않은 상태
+    }
+
+
     //스레드 크롤링
     private class JAT extends AsyncTask<Void, Void, Void> {
 
@@ -154,6 +179,7 @@ public class Frag3 extends Fragment {
             super.onPreExecute();
         }
 
+        @SuppressLint("WrongThread")
         @Override
         protected Void doInBackground(Void... strings) {
 
@@ -167,9 +193,28 @@ public class Frag3 extends Fragment {
 
 
             System.out.println("스레드 시작");
-            System.out.println(dbhelper.read_boolean());
-            System.out.println(dbhelper.table_exists());
-            System.out.println(dbhelper.read_boolean().equals("true") && dbhelper.table_exists());
+            //System.out.println(dbhelper.read_boolean());
+            //System.out.println(dbhelper.table_exists());
+            //System.out.println(dbhelper.read_boolean().equals("true") && dbhelper.table_exists());
+
+            while (getConnectivityStatus(view.getContext()) == TYPE_NOT_CONNECTED && !dbhelper.table_exists()) {
+
+
+                asyncDialog.setMessage("인터넷 연결 확인");
+                try {
+
+                    Thread.sleep(3000);
+
+                } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+
+
+            }
+
+            asyncDialog.setMessage("loading...");
+
+
             if (dbhelper.read_boolean().equals("true") && dbhelper.table_exists()) {
                 db_save_arrary_list();
             } else {
