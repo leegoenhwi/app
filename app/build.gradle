@@ -40,4 +40,8 @@ dependencies {
     //noinspection GradleCompatible
     implementation 'com.android.support:recyclerview-v7:25.2.0'
     implementation 'com.nex3z:toggle-button-group:1.1.9'
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.google.android.gms:play-services-ads:17.1.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

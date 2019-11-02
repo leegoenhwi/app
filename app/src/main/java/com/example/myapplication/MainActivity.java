@@ -18,6 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BottomSheetDialog bottomSheetDialog;
     private Button infor_butt;
     //private BottomSheetDialog
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +82,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setFrag(0); //프래그먼트 초기화 함수
         initNavigationDrawer(); // 드로어 네비게이션 뷰 초기화 함수
         bottomNavigationView(); // 바텀 네비게이션 뷰 초기화 함수
+
+
+
+        MobileAds.initialize(this, "ca-app-pub-5331304879189183~1559540203");
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
 
     }

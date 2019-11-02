@@ -31,6 +31,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDCqSPGJKxubFaUMywmhQUx-w2ThO-E2Gs"/>
+        <!--광고-->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5331304879189183~1559540203"/>
 
         <activity
             android:name=".SplashActivity"

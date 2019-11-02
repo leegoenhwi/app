@@ -2,10 +2,9 @@ package com.example.myapplication;
 
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.Spannable;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,25 +21,26 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.nex3z.togglebuttongroup.SingleSelectToggleGroup;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class Frag3 extends Fragment {
     private View view;
-    private TextView start;
-    private TextView end;
 
     private SwipeRefreshLayout refresh_Layout3;
     private SingleSelectToggleGroup singleSelectToggleGroup;
     private SingleSelectToggleGroup singleSelectToggleGroup2;
 
-    private  TextView textView = null;
-    private  TextView textView2 = null;
 
     private NestedScrollView scrollView_start = null;
     private NestedScrollView scrollView_arrive = null;
@@ -48,24 +48,63 @@ public class Frag3 extends Fragment {
     private LinearLayout scroll_vertical_layout1 = null;
     private LinearLayout scroll_vertical_layout2 = null;
 
-    private ArrayList<String> asan_cam = null;
-    private ArrayList<String> cam_asan = null;
-
-    private ArrayList<String> Cheonan_cam = null;
-    private ArrayList<String> cam_Cheonan = null;
-
-    private ArrayList<String> Cheonan_terminal_cam = null;
-    private ArrayList<String> cam_Cheonan_terminal = null;
-
-    private TextView[] textViews;
+    private TextView[] textViews1;
+    private TextView[] textViews2;
 
     int curr_Day;
 
     private String weekDay = "";
 
+    private ArrayList<String> day_cheonan = new ArrayList<String>();
+    private ArrayList<String> day_asan = new ArrayList<String>();
+    private ArrayList<String> day_terminal = new ArrayList<String>();
+    private ArrayList<String> fri_cheonan = new ArrayList<String>();
+    private ArrayList<String> fri_asan = new ArrayList<String>();
+    private ArrayList<String> fri_terminal = new ArrayList<String>();
+    private ArrayList<String> sat_cheonan_asan = new ArrayList<String>();
+    private ArrayList<String> sat_terminal = new ArrayList<String>();
+    private ArrayList<String> sun_cheonan_asan = new ArrayList<String>();
+    private ArrayList<String> sun_terminal = new ArrayList<String>();
+    private ArrayList<String> day_cheonan_rev = new ArrayList<String>();
+    private ArrayList<String> day_asan_rev = new ArrayList<String>();
+    private ArrayList<String> day_terminal_rev = new ArrayList<String>();
+    private ArrayList<String> fri_cheonan_rev = new ArrayList<String>();
+    private ArrayList<String> fri_asan_rev = new ArrayList<String>();
+    private ArrayList<String> fri_terminal_rev = new ArrayList<String>();
+    private ArrayList<String> sat_cheonan_rev = new ArrayList<String>();
+    private ArrayList<String> sat_asan_rev = new ArrayList<String>();
+    private ArrayList<String> sat_terminal_rev = new ArrayList<String>();
+    private ArrayList<String> sun_cheonan_rev = new ArrayList<String>();
+    private ArrayList<String> sun_asan_rev = new ArrayList<String>();
+    private ArrayList<String> sun_terminal_rev = new ArrayList<String>();
+    //쓰는 Arraylist들
+
+    private String url_day_cheonan = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_01_01_01.aspx";
+    private String url_day_asan = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_01_01_02.aspx";
+    private String url_day_terminal = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_01_02.aspx";
+    private String url_sat_cheonan_asan = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_02_01.aspx";
+    private String url_sat_terminal = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_02_02.aspx";
+    private String url_sun_cheonan_asan = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_03_01.aspx";
+    private String url_sun_terminal = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_03_02.aspx";
+    //크롤링에 필요한 url들
+
+    private DBHelper dbhelper;
+    //dbhelper클래스에 있는 메소드를 이용하여 db에 여러가지 접근이 가능하다
+
+
+    private JAT task;
+
+
+
+
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+
+
+        dbhelper = new DBHelper(getContext(), "db.db", null, 1);
+
         view = inflater.inflate(R.layout.fragment3, container, false);
 
         singleSelectToggleGroup = (SingleSelectToggleGroup) view.findViewById(R.id.group_choices);
@@ -77,77 +116,584 @@ public class Frag3 extends Fragment {
 
         refresh_Layout3 = (SwipeRefreshLayout) view.findViewById(R.id.refresh_Layout3);
 
-
         scroll_vertical_layout1 = (LinearLayout) view.findViewById(R.id.scroll_vertical_layout1);
         scroll_vertical_layout2 = (LinearLayout) view.findViewById(R.id.scroll_vertical_layout2);
 
-
-        //textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","      "),TextView.BufferType.SPANNABLE);
-
-       //색칠
-        /*Spannable spannable = (Spannable)textView.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), 14, 19, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);*/
-
+//        dbhelper.droptable();
+//
+//        task = new JAT();
+//        dbhelper.createtable();
+//        task.execute();
 
        re_swipe2();
-       // goal_select();
-       // day_select();
+
        current_day();
 
-        check_butt(weekDay);
+       check_butt(weekDay);
+       singleSelectToggleGroup2.clearCheck();
+       singleSelectToggleGroup2.check(R.id.choice_osan);
 
-        singleSelectToggleGroup2.check(R.id.choice_osan);
+       scroll_log();
 
-        scroll_view_set(scroll_vertical_layout1);
-        scroll_view_set(scroll_vertical_layout2);
+       db_save_arrary_list();
 
-        //size_up(3);
-
-        scroll_log();
-
-
+       day_select();
+       goal_select();
 
         return view;
 
     }
 
-    //Text_view 생성
-    public void scroll_view_set(LinearLayout linearLayout)
-    {
-        int Textview_num = 50;
+    //스레드 크롤링 11초 걸림
+    private class JAT extends AsyncTask<Void, Void, Void> {
 
-        textViews = new TextView[Textview_num];
+        @Override
+        protected Void doInBackground(Void... params) {
+            //제일 처음 가장 많은 열을 가지고 있는 평일 천안역 출발 행을 먼저 insert 해서 테이블 전체 틀을 만들고
+            //그 다음 행들의 값을 update로 각각의 행에 넣어줌
+            //쓰는 Arraylist와 db의 행은 day_cheonan과 cheonan_day 식으로 혼동되지 않게 다르게 구성함
+            //Asynctask이기 때문에 재실행시 오류 발생
+            System.out.println("스레드 시작");
+//            long now = System.currentTimeMillis();
+//            Date date = new Date(now);
+//            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
+//            String formatDate = sdfNow.format(date);
+//            System.out.println(formatDate);
 
-        for(int i = 0;i<Textview_num;i++)
-        {
-            textViews[i] = new TextView(getActivity());
-            textViews[i].setText("11 : 30");
-            textViews[i].setGravity(Gravity.CENTER);
-            textViews[i].setTextColor(Color.rgb(169,169,169));
-            textViews[i].setTextSize(25);
-            textViews[i].setHeight(190);
-            textViews[i].setId(i);
-            linearLayout.addView(textViews[i]);
+            try {
+                Document doc = Jsoup.connect(url_day_cheonan).get();
+                //url 페이지 가져오기
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+                //특정 부분을 잘라 table 이라는 Elements로 만들기
+
+                for (Element e : table) {
+                    //그 부분의 하나하나를
+                    if (!e.text().equals("X")) {
+                        //"X"와 일치하지 않을 경우에
+                        String n[]=(e.text()).split("\\(");
+                        //"("로 잘라서
+                        day_cheonan_rev.add(n[0]);
+                        //제일 처음 값을 Arraylist에 넣는다
+                        //이것을 하는 이유는 "(금X)"를 제거하고 사용하기 위해서 이며 "("는 split의 매개변수로 사용할 수 없으므로 split("\\(")로 사용함(검색해보면 나옴)
+                    }
+                }
+                for (int i = 0; i < day_cheonan_rev.size(); i++) {
+                    //Arraylist의 갯수만큼
+                    System.out.println("포문");
+                    dbhelper.insert(day_cheonan_rev.get(i));
+                    //db에 값을 하나하나 insert 하여 테이블 전체 틀을 작성함
+                }
+                dbhelper.insert("end");
+                //insert의 매개변수로 "end"를 보내 마지막에 null을 넣어줌
+                System.out.println(day_cheonan_rev.size());
+                System.out.println("평일 천안 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //여기서부터는 전부 update를 사용한다
+            try {
+                Document doc = Jsoup.connect(url_day_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_terminal_rev.size(); i++) {
+                    //여기서 i가 1이고 아래의 get()안에 i-1을 넣은 이유는 Arraylist는 0부터 시작하고
+                    //db의 id값은 1부터 시작하기 때문에 이런식으로 구성함
+                    System.out.println("포문");
+                    System.out.println(day_terminal_rev.get(i-1));
+                    System.out.println(i);
+                    dbhelper.update(day_terminal_rev.get(i-1), i, "terminal_day_rev");
+                }
+                System.out.println(day_terminal_rev.size());
+                System.out.println("평일 터미널 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_asan_rev.get(i-1), i, "asan_day_rev");
+                }
+                System.out.println(day_asan_rev.size());
+                System.out.println("평일 아산 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_cheonan).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        fri_cheonan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= fri_cheonan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_cheonan_rev.get(i-1), i, "cheonan_fri_rev");
+                }
+                System.out.println(fri_cheonan_rev.size());
+                System.out.println("평일 천안 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        fri_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_asan_rev.get(i-1), i, "asan_fri_rev");
+                }
+                System.out.println(fri_asan_rev.size());
+                System.out.println("금 아산 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        fri_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= fri_terminal_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_terminal_rev.get(i-1), i, "terminal_fri_rev");
+                }
+                System.out.println(fri_terminal_rev.size());
+                System.out.println("금 터미널 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(3)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sat_cheonan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_cheonan_rev.get(i-1), i, "cheonan_sat_rev");
+                }
+                System.out.println(sat_cheonan_rev.size());
+                System.out.println("토 천안 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(4)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sat_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sat_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_asan_rev.get(i-1), i, "asan_sat_rev");
+                }
+                System.out.println(sat_asan_rev.size());
+                System.out.println("토 아산 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sat_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sat_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sat_terminal_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_terminal_rev.get(i-1), i, "terminal_sat_rev");
+                }
+                System.out.println(sat_terminal_rev.size());
+                System.out.println("토 터미널 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(3)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sun_cheonan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_cheonan_rev.get(i-1), i, "cheonan_sun_rev");
+                }
+                System.out.println(sun_cheonan_rev.size());
+                System.out.println("일 천안 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(4)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sun_asan_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sun_asan_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_asan_rev.get(i-1), i, "asan_sun_rev");
+                }
+                System.out.println(sun_asan_rev.size());
+                System.out.println("일 아산 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sun_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(2)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        sun_terminal_rev.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= sun_terminal_rev.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_terminal_rev.get(i-1), i, "terminal_sun_rev");
+                }
+                System.out.println(sun_terminal_rev.size());
+                System.out.println("일 터미널 역");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_terminal.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_terminal.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_terminal.get(i-1), i, "terminal_day");
+                }
+                System.out.println(day_terminal.size());
+                System.out.println("평일 터미널");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_asan.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_asan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_asan.get(i-1), i, "asan_day");
+                }
+                System.out.println(day_asan.size());
+                System.out.println("평일 아산");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_cheonan).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().equals("X")) {
+                        String n[]=(e.text()).split("\\(");
+                        day_cheonan.add(n[0]);
+                    }
+                }
+                for (int i = 1; i <= day_cheonan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(day_cheonan.get(i-1), i, "cheonan_day");
+                }
+                System.out.println(day_cheonan.size());
+                System.out.println("평일 천안");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        fri_terminal.add(e.text());
+                    }
+                }
+                for (int i = 1; i <= fri_terminal.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_terminal.get(i-1), i, "terminal_fri");
+                }
+                System.out.println(fri_terminal.size());
+                System.out.println("금 터미널");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        fri_asan.add(e.text());
+                    }
+                }
+                for (int i = 1; i <= fri_asan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_asan.get(i-1), i, "asan_fri");
+                }
+                System.out.println(fri_asan.size());
+                System.out.println("금 아산");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_day_cheonan).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    if (!e.text().contains("X")) {
+                        fri_cheonan.add(e.text());
+                    }
+                }
+                for (int i = 1; i <= fri_cheonan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(fri_cheonan.get(i-1), i, "cheonan_fri");
+                }
+                System.out.println(fri_cheonan.size());
+                System.out.println("금 천안");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    sat_cheonan_asan.add(e.text());
+                }
+                for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_cheonan_asan.get(i-1), i, "cheonan_asan_sat");
+                }
+                System.out.println(sat_cheonan_asan.size());
+                System.out.println("토 천안아산");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sat_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    sat_terminal.add(e.text());
+                }
+                for (int i = 1; i <= sat_terminal.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sat_terminal.get(i-1), i, "terminal_sat");
+                }
+                System.out.println(sat_terminal.size());
+                System.out.println("토 터미널");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    sun_cheonan_asan.add(e.text());
+                }
+                for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_cheonan_asan.get(i-1), i, "cheonan_asan_sun");
+                }
+                System.out.println(sun_cheonan_asan.size());
+                System.out.println("일 천안아산");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Document doc = Jsoup.connect(url_sun_terminal).get();
+
+                Elements table = doc.select("div.table01 td:eq(1)");
+
+                for (Element e : table) {
+                    sun_terminal.add(e.text());
+                }
+                for (int i = 1; i <= sun_terminal.size(); i++) {
+                    System.out.println("포문");
+                    dbhelper.update(sun_terminal.get(i-1), i, "terminal_sun");
+                }
+                System.out.println(sun_terminal.size());
+                System.out.println("일 터미널");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+//            long now1 = System.currentTimeMillis();
+//            Date date1 = new Date(now1);
+//            SimpleDateFormat sdfNow1 = new SimpleDateFormat("HH:mm:ss");
+//            String formatDate1 = sdfNow1.format(date1);
+            System.out.println("스레드 종료");
+//            System.out.println(formatDate1);
+            return null;
         }
-
-        if(linearLayout.getId() == scroll_vertical_layout1.getId()) {
-            size_up(10);
-        }
-        else
-        {
-            size_up(6);
-        }
-
     }
 
-    //특정 Text_view 크기 색
-    public void size_up(int x)
+
+    //db데이터를 arraylist에 저장
+    private void db_save_arrary_list()
     {
-        textViews[x].setTextSize(35);
-        textViews[x].setTextColor(Color.rgb(248,91,78));
+        for (int column = 1; column < 23; column++) {
+            //22개의 Arraylist에 모두 값을 넣어준다 column은 x좌표, id는 y좌표로 생각하면 편함
+            for (int id = 1; !dbhelper.read(id, column).equals("end"); id++) {
+                //read한 값이 가장 마지막 값인 null을 만나면 반환되는 "end"가 아닐 때 까지 반복적으로 실행
+                System.out.println(id);
+                System.out.println(dbhelper.read(id, column));
+                if (column == 1) {
+                    day_cheonan_rev.add(dbhelper.read(id, column));
+                } else if (column == 2) {
+                    day_terminal_rev.add(dbhelper.read(id, column));
+                } else if (column == 3) {
+                    day_asan_rev.add(dbhelper.read(id, column));
+                } else if (column == 4) {
+                    fri_cheonan_rev.add(dbhelper.read(id, column));
+                } else if (column == 5) {
+                    fri_asan_rev.add(dbhelper.read(id, column));
+                } else if (column == 6) {
+                    fri_terminal_rev.add(dbhelper.read(id, column));
+                } else if (column == 7) {
+                    sat_cheonan_rev.add(dbhelper.read(id, column));
+                } else if (column == 8) {
+                    sat_asan_rev.add(dbhelper.read(id, column));
+                } else if (column == 9) {
+                    sat_terminal_rev.add(dbhelper.read(id, column));
+                } else if (column == 10) {
+                    sun_cheonan_rev.add(dbhelper.read(id, column));
+                } else if (column == 11) {
+                    sun_asan_rev.add(dbhelper.read(id, column));
+                } else if (column == 12) {
+                    sun_terminal_rev.add(dbhelper.read(id, column));
+                } else if (column == 13) {
+                    day_terminal.add(dbhelper.read(id, column));
+                } else if (column == 14) {
+                    day_asan.add(dbhelper.read(id, column));
+                } else if (column == 15) {
+                    day_cheonan.add(dbhelper.read(id, column));
+                } else if (column == 16) {
+                    fri_terminal.add(dbhelper.read(id, column));
+                } else if (column == 17) {
+                    fri_asan.add(dbhelper.read(id, column));
+                } else if (column == 18) {
+                    fri_cheonan.add(dbhelper.read(id, column));
+                } else if (column == 19) {
+                    sat_cheonan_asan.add(dbhelper.read(id, column));
+                } else if (column == 20) {
+                    sat_terminal.add(dbhelper.read(id, column));
+                } else if (column == 21) {
+                    sun_cheonan_asan.add(dbhelper.read(id, column));
+                } else {
+                    sun_terminal.add(dbhelper.read(id, column));
+                }
+            }
+        }
     }
 
-    //scroll_position_log
+    
     public void scroll_log()
     {
         scrollView_start.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
@@ -185,44 +731,253 @@ public class Frag3 extends Fragment {
     //목적지 선택
     public void goal_select()
     {
+
         singleSelectToggleGroup2.setOnCheckedChangeListener(new SingleSelectToggleGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SingleSelectToggleGroup group, int checkedId) {
+
+                ArrayList<String> empty_array1 = new ArrayList<>();
+                ArrayList<String> empty_array2 = new ArrayList<>();
+
+                scroll_vertical_layout1.removeAllViews();
+                scroll_vertical_layout2.removeAllViews();
+
+                if(!empty_array1.isEmpty())
+                {
+                    empty_array1.clear();
+                }
+
+                if(!empty_array2.isEmpty())
+                {
+                    empty_array2.clear();
+                }
+
+
                 switch (checkedId){
                     case R.id.choice_osan:
-                        start.setText("아산역      ->      아산캠퍼스");
-                        end.setText("아산캠퍼스      ->      아산역");
-                        textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                        textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                        if(singleSelectToggleGroup.getCheckedId() ==   curr_Day)
+
+                        if(singleSelectToggleGroup.getCheckedId() == R.id.choice_e)
                         {
-                            //System.out.println(current_Day);
-                            current_asan_cam();
-                            current_cam_osan();
+                            empty_array1.addAll(fri_asan);
+                            empty_array2.addAll(fri_asan_rev);
+                        }
+
+                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_f)
+                        {
+                            empty_array1.addAll(sat_cheonan_asan);
+                            empty_array2.addAll(sat_asan_rev);
+                        }
+
+                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_g)
+                        {
+                            empty_array1.addAll(sun_cheonan_asan);
+                            empty_array2.addAll(sun_asan_rev);
+                        }
+
+                        else
+                        {
+                            empty_array1.addAll(day_asan);
+                            empty_array2.addAll(day_asan_rev);
+                        }
+
+                        int Textview_num1 = empty_array1.size();
+                        int Textview_num2 = empty_array2.size();
+
+                        textViews1 = new TextView[Textview_num1];
+                        textViews2 = new TextView[Textview_num2];
+
+                        for(int i = 0;i<Textview_num1;i++)
+                        {
+                            textViews1[i] = new TextView(getActivity());
+                            textViews1[i].setText(empty_array1.get(i));
+                            textViews1[i].setGravity(Gravity.CENTER);
+                            textViews1[i].setTextColor(Color.rgb(169,169,169));
+                            textViews1[i].setTextSize(25);
+                            textViews1[i].setHeight(190);
+
+                            scroll_vertical_layout1.addView(textViews1[i]);
+                        }
+
+                        for(int i = 0;i<Textview_num2;i++)
+                        {
+                            textViews2[i] = new TextView(getActivity());
+                            textViews2[i].setText(empty_array2.get(i));
+                            textViews2[i].setGravity(Gravity.CENTER);
+                            textViews2[i].setTextColor(Color.rgb(169,169,169));
+                            textViews2[i].setTextSize(25);
+                            textViews2[i].setHeight(190);
+
+                            scroll_vertical_layout2.addView(textViews2[i]);
+                        }
+
+
+                        if(singleSelectToggleGroup.getCheckedId() ==   curr_Day)
+                       {
+                           int x = current_time(empty_array1);
+                           textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                           scroll_vertical_layout1.removeViewAt(x);
+                           scroll_vertical_layout1.addView( textViews1[x],x);
+
+                           int y = current_time(empty_array2);
+                           textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                           scroll_vertical_layout2.removeViewAt(y);
+                           scroll_vertical_layout2.addView( textViews2[y],y);
+
+                           scroll_ani(x,y);
+                       }
+                        else
+                        {
+                            scroll_set();
                         }
                         break;
                     case R.id.choice_Cheonan:
-                        start.setText("천안역      ->      아산캠퍼스");
-                        end.setText("아산캠퍼스      ->      천안역");
-                        textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                        textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
+
+                        if(singleSelectToggleGroup.getCheckedId() == R.id.choice_e)
+                        {
+                            empty_array1.addAll(fri_cheonan);
+                            empty_array2.addAll(fri_cheonan_rev);
+                        }
+
+                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_f)
+                        {
+                            empty_array1.addAll(sat_cheonan_asan);
+                            empty_array2.addAll(sat_cheonan_rev);
+                        }
+
+                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_g)
+                        {
+                            empty_array1.addAll(sun_cheonan_asan);
+                            empty_array2.addAll(sun_cheonan_rev);
+                        }
+
+                        else
+                        {
+                            empty_array1.addAll(day_cheonan);
+                            empty_array2.addAll(day_cheonan_rev);
+                        }
+
+                        int Textview_num3 = empty_array1.size();
+                        int Textview_num4 = empty_array2.size();
+
+                        textViews1 = new TextView[Textview_num3];
+                        textViews2 = new TextView[Textview_num4];
+
+                        for(int i = 0;i<Textview_num3;i++)
+                        {
+                            textViews1[i] = new TextView(getActivity());
+                            textViews1[i].setText(empty_array1.get(i));
+                            textViews1[i].setGravity(Gravity.CENTER);
+                            textViews1[i].setTextColor(Color.rgb(169,169,169));
+                            textViews1[i].setTextSize(25);
+                            textViews1[i].setHeight(190);
+
+                            scroll_vertical_layout1.addView(textViews1[i]);
+                        }
+
+                        for(int i = 0;i<Textview_num4;i++)
+                        {
+                            textViews2[i] = new TextView(getActivity());
+                            textViews2[i].setText(empty_array2.get(i));
+                            textViews2[i].setGravity(Gravity.CENTER);
+                            textViews2[i].setTextColor(Color.rgb(169,169,169));
+                            textViews2[i].setTextSize(25);
+                            textViews2[i].setHeight(190);
+
+                            scroll_vertical_layout2.addView(textViews2[i]);
+                        }
                         if(singleSelectToggleGroup.getCheckedId() ==  curr_Day)
                         {
-                            //System.out.println(current_Day);
-                            current_Cheonan_cam();
-                            current_cam_Cheonan();
+                            int x = current_time(empty_array1);
+                            textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                            scroll_vertical_layout1.removeViewAt(x);
+                            scroll_vertical_layout1.addView( textViews1[x],x);
+
+                            int y = current_time(empty_array2);
+                            textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                            scroll_vertical_layout2.removeViewAt(y);
+                            scroll_vertical_layout2.addView( textViews2[y],y);
+
+                            scroll_ani(x,y);
+                        }
+                        else
+                        {
+                            scroll_set();
                         }
                         break;
                     case R.id.choice_Cheonan_terminal:
-                        start.setText("천안터미널      ->      아산캠퍼스");
-                        end.setText("아산캠퍼스      ->      천안터미널");
-                        textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                        textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
+
+                        if(singleSelectToggleGroup.getCheckedId() == R.id.choice_e)
+                        {
+                            empty_array1.addAll(fri_terminal);
+                            empty_array2.addAll(fri_terminal_rev);
+                        }
+
+                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_f)
+                        {
+                            empty_array1.addAll(sat_terminal);
+                            empty_array2.addAll(sat_terminal_rev);
+                        }
+
+                        else if(singleSelectToggleGroup.getCheckedId() == R.id.choice_g)
+                        {
+                            empty_array1.addAll(sun_terminal);
+                            empty_array2.addAll(sun_terminal_rev);
+                        }
+
+                        else
+                        {
+                            empty_array1.addAll(day_terminal);
+                            empty_array2.addAll(day_terminal_rev);
+                        }
+
+                        int Textview_num5 = empty_array1.size();
+                        int Textview_num6 = empty_array2.size();
+
+                        textViews1 = new TextView[Textview_num5];
+                        textViews2 = new TextView[Textview_num6];
+
+                        for(int i = 0;i<Textview_num5;i++)
+                        {
+                            textViews1[i] = new TextView(getActivity());
+                            textViews1[i].setText(empty_array1.get(i));
+                            textViews1[i].setGravity(Gravity.CENTER);
+                            textViews1[i].setTextColor(Color.rgb(169,169,169));
+                            textViews1[i].setTextSize(25);
+                            textViews1[i].setHeight(190);
+
+                            scroll_vertical_layout1.addView(textViews1[i]);
+                        }
+
+                        for(int i = 0;i<Textview_num6;i++)
+                        {
+                            textViews2[i] = new TextView(getActivity());
+                            textViews2[i].setText(empty_array2.get(i));
+                            textViews2[i].setGravity(Gravity.CENTER);
+                            textViews2[i].setTextColor(Color.rgb(169,169,169));
+                            textViews2[i].setTextSize(25);
+                            textViews2[i].setHeight(190);
+
+                            scroll_vertical_layout2.addView(textViews2[i]);
+                        }
+
+
                         if(singleSelectToggleGroup.getCheckedId() == curr_Day)
                         {
-                            //System.out.println(current_Day);
-                            current_Cheonan_terminal_cam();
-                            current_cam_Cheonan_terminal();
+                            int x = current_time(empty_array1);
+                            textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                            scroll_vertical_layout1.removeViewAt(x);
+                            scroll_vertical_layout1.addView( textViews1[x],x);
+
+                            int y = current_time(empty_array2);
+                            textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                            scroll_vertical_layout2.removeViewAt(y);
+                            scroll_vertical_layout2.addView( textViews2[y],y);
+
+                            scroll_ani(x,y);
+                        }
+                        else
+                        {
+                            scroll_set();
                         }
                         break;
                 }
@@ -233,125 +988,119 @@ public class Frag3 extends Fragment {
     //리스트 초기화
     public void array_reset()
     {
-        if(asan_cam != null) {
-            asan_cam.clear();
-            cam_asan.clear();
-
-            Cheonan_cam.clear();
-            cam_Cheonan.clear();
-
-            Cheonan_terminal_cam.clear();
-            cam_Cheonan_terminal.clear();
-        }
+       day_asan.clear();
+       day_asan_rev.clear();
+       day_cheonan.clear();
+       day_cheonan_rev.clear();
+       day_terminal.clear();
+       day_terminal_rev.clear();
+       fri_asan.clear();
+       fri_asan_rev.clear();
+       fri_cheonan.clear();
+       fri_cheonan_rev.clear();
+       fri_terminal.clear();
+       fri_terminal_rev.clear();
+       sat_asan_rev.clear();
+       sat_cheonan_asan.clear();
+       sat_cheonan_rev.clear();
+       sat_terminal.clear();
+       sat_terminal_rev.clear();
+       sun_asan_rev.clear();
+       sun_cheonan_asan.clear();
+       sun_cheonan_rev.clear();
+       sun_terminal.clear();
+       sun_terminal_rev.clear();
     }
 
     //요일 선택
     public void day_select()
     {
-
-       // final String dayday = new String(weekDay);
-        array_reset();
-
         singleSelectToggleGroup.setOnCheckedChangeListener(new SingleSelectToggleGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SingleSelectToggleGroup group, int checkedId) {
 
+                scroll_vertical_layout1.removeAllViews();
+                scroll_vertical_layout2.removeAllViews();
+
+                ArrayList<String> empty_array3 = new ArrayList<>();
+                ArrayList<String> empty_array4 = new ArrayList<>();
+
+                scroll_vertical_layout1.removeAllViews();
+                scroll_vertical_layout2.removeAllViews();
+
+                if(!empty_array3.isEmpty())
+                {
+                    empty_array3.clear();
+                }
+
+                if(!empty_array4.isEmpty())
+                {
+                    empty_array4.clear();
+                }
+
                 if( (checkedId == R.id.choice_a))
                 {
-                        //array_reset();
-
-                        asan_cam = new ArrayList<>();
-                        asan_cam.add("08:40");asan_cam.add("08:50");asan_cam.add("08:55");asan_cam.add("09:05");asan_cam.add("09:15");
-                        asan_cam.add("09:55");asan_cam.add("10:15");asan_cam.add("10:45");asan_cam.add("11:10");asan_cam.add("11:20");
-                        asan_cam.add("11:50");asan_cam.add("12:05");asan_cam.add("12:20");asan_cam.add("12:45");asan_cam.add("13:15");
-                        asan_cam.add("13:45");asan_cam.add("14:15");asan_cam.add("14:45");asan_cam.add("15:15");asan_cam.add("15:40");
-                        asan_cam.add("15:50");asan_cam.add("16:15");asan_cam.add("16:40");asan_cam.add("16:55");asan_cam.add("17:20");
-                        asan_cam.add("17:40");asan_cam.add("17:50");asan_cam.add("18:10");asan_cam.add("18:35");asan_cam.add("18:45");
-                        asan_cam.add("19:45");asan_cam.add("20:05");asan_cam.add("20:25");asan_cam.add("20:45");asan_cam.add("21:05");
-                        asan_cam.add("21:25");asan_cam.add("21:45");asan_cam.add("22:15");
-
-                        cam_asan = new ArrayList<>();
-                        cam_asan.add("08:40");cam_asan.add("09:45");cam_asan.add("10:05");cam_asan.add("10:35");cam_asan.add("11:10");
-                        cam_asan.add("11:40");cam_asan.add("11:55");cam_asan.add("12:10");cam_asan.add("12:35");cam_asan.add("13:05");
-                        cam_asan.add("13:35");cam_asan.add("14:05");cam_asan.add("14:35");cam_asan.add("15:05");cam_asan.add("15:30");
-                        cam_asan.add("15:40");cam_asan.add("16:05");cam_asan.add("16:30");cam_asan.add("16:45");cam_asan.add("17:10");
-                        cam_asan.add("17:30");cam_asan.add("17:40");cam_asan.add("18:00");cam_asan.add("18:25");cam_asan.add("18:35");
-                        cam_asan.add("19:00");cam_asan.add("19:20");cam_asan.add("19:40");cam_asan.add("20:00");cam_asan.add("20:20");
-                        cam_asan.add("20:40");cam_asan.add("21:00");cam_asan.add("21:30");
-
-                        Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("08:15");Cheonan_cam.add("08:35");Cheonan_cam.add("08:45");Cheonan_cam.add("08:50");Cheonan_cam.add("08:53");
-                    Cheonan_cam.add("08:56");Cheonan_cam.add("08:58");Cheonan_cam.add("09:00");Cheonan_cam.add("09:03");Cheonan_cam.add("09:10");
-                    Cheonan_cam.add("09:50");Cheonan_cam.add("10:00");Cheonan_cam.add("10:20");Cheonan_cam.add("10:40");Cheonan_cam.add("10:50");
-                    Cheonan_cam.add("10:55");Cheonan_cam.add("11:00");Cheonan_cam.add("11:10");Cheonan_cam.add("11:40");Cheonan_cam.add("12:00");
-                    Cheonan_cam.add("12:05");Cheonan_cam.add("12:30");Cheonan_cam.add("13:00");Cheonan_cam.add("13:30");Cheonan_cam.add("14:00");
-                    Cheonan_cam.add("14:30");Cheonan_cam.add("15:00");Cheonan_cam.add("15:30");Cheonan_cam.add("15:40");Cheonan_cam.add("15:50");
-                    Cheonan_cam.add("16:00");Cheonan_cam.add("16:20");Cheonan_cam.add("16:55");Cheonan_cam.add("17:05");Cheonan_cam.add("17:25");
-                    Cheonan_cam.add("17:50");Cheonan_cam.add("18:00");Cheonan_cam.add("18:15");Cheonan_cam.add("18:40");Cheonan_cam.add("18:55");
-                    Cheonan_cam.add("19:05");Cheonan_cam.add("19:30");Cheonan_cam.add("19:50");Cheonan_cam.add("20:10");Cheonan_cam.add("20:30");
-                    Cheonan_cam.add("20:50");Cheonan_cam.add("21:10");Cheonan_cam.add("21:30");Cheonan_cam.add("22:20");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("08:15");cam_Cheonan.add("09:35");cam_Cheonan.add("09:55");cam_Cheonan.add("10:35");cam_Cheonan.add("11:15");
-                    cam_Cheonan.add("11:40");cam_Cheonan.add("12:10");cam_Cheonan.add("12:40");cam_Cheonan.add("13:10");cam_Cheonan.add("13:40");
-                    cam_Cheonan.add("14:10");cam_Cheonan.add("14:40");cam_Cheonan.add("15:10");cam_Cheonan.add("15:20");cam_Cheonan.add("15:30");
-                    cam_Cheonan.add("15:40");cam_Cheonan.add("16:00");cam_Cheonan.add("16:30");cam_Cheonan.add("16:40");cam_Cheonan.add("17:00");
-                    cam_Cheonan.add("17:20");cam_Cheonan.add("17:30");cam_Cheonan.add("17:45");cam_Cheonan.add("18:10");cam_Cheonan.add("18:25");
-                    cam_Cheonan.add("18:35");cam_Cheonan.add("19:00");cam_Cheonan.add("19:20");cam_Cheonan.add("19:40");cam_Cheonan.add("20:00");
-                    cam_Cheonan.add("20:20");cam_Cheonan.add("20:40");cam_Cheonan.add("21:00");cam_Cheonan.add("21:30");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("08:10");Cheonan_terminal_cam.add("08:25");Cheonan_terminal_cam.add("08:35");Cheonan_terminal_cam.add("08:40");Cheonan_terminal_cam.add("08:45");
-                    Cheonan_terminal_cam.add("08:50");Cheonan_terminal_cam.add("08:55");Cheonan_terminal_cam.add("09:00");Cheonan_terminal_cam.add("09:40");Cheonan_terminal_cam.add("09:55");
-                    Cheonan_terminal_cam.add("10:15");Cheonan_terminal_cam.add("10:35");Cheonan_terminal_cam.add("10:50");Cheonan_terminal_cam.add("11:00");Cheonan_terminal_cam.add("11:30");
-                    Cheonan_terminal_cam.add("11:45");Cheonan_terminal_cam.add("12:00");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:00");Cheonan_terminal_cam.add("13:30");
-                    Cheonan_terminal_cam.add("14:00");Cheonan_terminal_cam.add("14:30");Cheonan_terminal_cam.add("15:00");Cheonan_terminal_cam.add("15:20");Cheonan_terminal_cam.add("15:40");
-                    Cheonan_terminal_cam.add("16:00");Cheonan_terminal_cam.add("16:10");Cheonan_terminal_cam.add("16:30");Cheonan_terminal_cam.add("17:00");Cheonan_terminal_cam.add("17:10");
-                    Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("17:50");Cheonan_terminal_cam.add("18:00");Cheonan_terminal_cam.add("18:15");Cheonan_terminal_cam.add("18:40");
-                    Cheonan_terminal_cam.add("19:00");Cheonan_terminal_cam.add("19:20");Cheonan_terminal_cam.add("19:40");Cheonan_terminal_cam.add("20:10");Cheonan_terminal_cam.add("20:40");
-                    Cheonan_terminal_cam.add("21:20");Cheonan_terminal_cam.add("22:00");
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("07:45"); cam_Cheonan_terminal.add("08:10"); cam_Cheonan_terminal.add("08:20"); cam_Cheonan_terminal.add("09:10"); cam_Cheonan_terminal.add("09:25");
-                    cam_Cheonan_terminal.add("09:45"); cam_Cheonan_terminal.add("10:05"); cam_Cheonan_terminal.add("10:30"); cam_Cheonan_terminal.add("11:00"); cam_Cheonan_terminal.add("11:30");
-                    cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("12:30"); cam_Cheonan_terminal.add("13:00"); cam_Cheonan_terminal.add("13:30"); cam_Cheonan_terminal.add("14:00");
-                    cam_Cheonan_terminal.add("14:30"); cam_Cheonan_terminal.add("14:50"); cam_Cheonan_terminal.add("15:10"); cam_Cheonan_terminal.add("15:30"); cam_Cheonan_terminal.add("15:40");
-                    cam_Cheonan_terminal.add("16:00"); cam_Cheonan_terminal.add("16:30"); cam_Cheonan_terminal.add("16:40"); cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("17:20");
-                    cam_Cheonan_terminal.add("17:30"); cam_Cheonan_terminal.add("17:45"); cam_Cheonan_terminal.add("18:10"); cam_Cheonan_terminal.add("18:30"); cam_Cheonan_terminal.add("18:50");
-                    cam_Cheonan_terminal.add("19:10"); cam_Cheonan_terminal.add("19:40"); cam_Cheonan_terminal.add("20:10"); cam_Cheonan_terminal.add("20:50"); cam_Cheonan_terminal.add("21:30");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(day_asan);
+                        empty_array4.addAll(day_asan_rev);
                     }
-                    if(R.id.choice_a == curr_Day) {
-                        //System.out.println(dayday);
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(day_cheonan);
+                        empty_array4.addAll(day_cheonan_rev);
+                    }
+
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(day_terminal);
+                        empty_array4.addAll(day_terminal_rev);
+                    }
+
+                    int Textview_num3 = empty_array3.size();
+                    int Textview_num4 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num3];
+                    textViews2 = new TextView[Textview_num4];
+
+                    for(int i = 0;i<Textview_num3;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num4;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_a == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
                     }
                     else
                     {
@@ -359,103 +1108,69 @@ public class Frag3 extends Fragment {
                     }
 
                 }
-
-                else if( (checkedId == R.id.choice_b))
+                if( (checkedId == R.id.choice_b))
                 {
-                    //array_reset();
-
-                    asan_cam = new ArrayList<>();
-                    asan_cam.add("08:40");asan_cam.add("08:50");asan_cam.add("08:55");asan_cam.add("09:05");asan_cam.add("09:15");
-                    asan_cam.add("09:55");asan_cam.add("10:15");asan_cam.add("10:45");asan_cam.add("11:10");asan_cam.add("11:20");
-                    asan_cam.add("11:50");asan_cam.add("12:05");asan_cam.add("12:20");asan_cam.add("12:45");asan_cam.add("13:15");
-                    asan_cam.add("13:45");asan_cam.add("14:15");asan_cam.add("14:45");asan_cam.add("15:15");asan_cam.add("15:40");
-                    asan_cam.add("15:50");asan_cam.add("16:15");asan_cam.add("16:40");asan_cam.add("16:55");asan_cam.add("17:20");
-                    asan_cam.add("17:40");asan_cam.add("17:50");asan_cam.add("18:10");asan_cam.add("18:35");asan_cam.add("18:45");
-                    asan_cam.add("19:45");asan_cam.add("20:05");asan_cam.add("20:25");asan_cam.add("20:45");asan_cam.add("21:05");
-                    asan_cam.add("21:25");asan_cam.add("21:45");asan_cam.add("22:15");
-
-                    cam_asan = new ArrayList<>();
-                    cam_asan.add("08:40");cam_asan.add("09:45");cam_asan.add("10:05");cam_asan.add("10:35");cam_asan.add("11:10");
-                    cam_asan.add("11:40");cam_asan.add("11:55");cam_asan.add("12:10");cam_asan.add("12:35");cam_asan.add("13:05");
-                    cam_asan.add("13:35");cam_asan.add("14:05");cam_asan.add("14:35");cam_asan.add("15:05");cam_asan.add("15:30");
-                    cam_asan.add("15:40");cam_asan.add("16:05");cam_asan.add("16:30");cam_asan.add("16:45");cam_asan.add("17:10");
-                    cam_asan.add("17:30");cam_asan.add("17:40");cam_asan.add("18:00");cam_asan.add("18:25");cam_asan.add("18:35");
-                    cam_asan.add("19:00");cam_asan.add("19:20");cam_asan.add("19:40");cam_asan.add("20:00");cam_asan.add("20:20");
-                    cam_asan.add("20:40");cam_asan.add("21:00");cam_asan.add("21:30");
-
-                    Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("08:15");Cheonan_cam.add("08:35");Cheonan_cam.add("08:45");Cheonan_cam.add("08:50");Cheonan_cam.add("08:53");
-                    Cheonan_cam.add("08:56");Cheonan_cam.add("08:58");Cheonan_cam.add("09:00");Cheonan_cam.add("09:03");Cheonan_cam.add("09:10");
-                    Cheonan_cam.add("09:50");Cheonan_cam.add("10:00");Cheonan_cam.add("10:20");Cheonan_cam.add("10:40");Cheonan_cam.add("10:50");
-                    Cheonan_cam.add("10:55");Cheonan_cam.add("11:00");Cheonan_cam.add("11:10");Cheonan_cam.add("11:40");Cheonan_cam.add("12:00");
-                    Cheonan_cam.add("12:05");Cheonan_cam.add("12:30");Cheonan_cam.add("13:00");Cheonan_cam.add("13:30");Cheonan_cam.add("14:00");
-                    Cheonan_cam.add("14:30");Cheonan_cam.add("15:00");Cheonan_cam.add("15:30");Cheonan_cam.add("15:40");Cheonan_cam.add("15:50");
-                    Cheonan_cam.add("16:00");Cheonan_cam.add("16:20");Cheonan_cam.add("16:55");Cheonan_cam.add("17:05");Cheonan_cam.add("17:25");
-                    Cheonan_cam.add("17:50");Cheonan_cam.add("18:00");Cheonan_cam.add("18:15");Cheonan_cam.add("18:40");Cheonan_cam.add("18:55");
-                    Cheonan_cam.add("19:05");Cheonan_cam.add("19:30");Cheonan_cam.add("19:50");Cheonan_cam.add("20:10");Cheonan_cam.add("20:30");
-                    Cheonan_cam.add("20:50");Cheonan_cam.add("21:10");Cheonan_cam.add("21:30");Cheonan_cam.add("22:20");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("08:15");cam_Cheonan.add("09:35");cam_Cheonan.add("09:55");cam_Cheonan.add("10:35");cam_Cheonan.add("11:15");
-                    cam_Cheonan.add("11:40");cam_Cheonan.add("12:10");cam_Cheonan.add("12:40");cam_Cheonan.add("13:10");cam_Cheonan.add("13:40");
-                    cam_Cheonan.add("14:10");cam_Cheonan.add("14:40");cam_Cheonan.add("15:10");cam_Cheonan.add("15:20");cam_Cheonan.add("15:30");
-                    cam_Cheonan.add("15:40");cam_Cheonan.add("16:00");cam_Cheonan.add("16:30");cam_Cheonan.add("16:40");cam_Cheonan.add("17:00");
-                    cam_Cheonan.add("17:20");cam_Cheonan.add("17:30");cam_Cheonan.add("17:45");cam_Cheonan.add("18:10");cam_Cheonan.add("18:25");
-                    cam_Cheonan.add("18:35");cam_Cheonan.add("19:00");cam_Cheonan.add("19:20");cam_Cheonan.add("19:40");cam_Cheonan.add("20:00");
-                    cam_Cheonan.add("20:20");cam_Cheonan.add("20:40");cam_Cheonan.add("21:00");cam_Cheonan.add("21:30");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("08:10");Cheonan_terminal_cam.add("08:25");Cheonan_terminal_cam.add("08:35");Cheonan_terminal_cam.add("08:40");Cheonan_terminal_cam.add("08:45");
-                    Cheonan_terminal_cam.add("08:50");Cheonan_terminal_cam.add("08:55");Cheonan_terminal_cam.add("09:00");Cheonan_terminal_cam.add("09:40");Cheonan_terminal_cam.add("09:55");
-                    Cheonan_terminal_cam.add("10:15");Cheonan_terminal_cam.add("10:35");Cheonan_terminal_cam.add("10:50");Cheonan_terminal_cam.add("11:00");Cheonan_terminal_cam.add("11:30");
-                    Cheonan_terminal_cam.add("11:45");Cheonan_terminal_cam.add("12:00");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:00");Cheonan_terminal_cam.add("13:30");
-                    Cheonan_terminal_cam.add("14:00");Cheonan_terminal_cam.add("14:30");Cheonan_terminal_cam.add("15:00");Cheonan_terminal_cam.add("15:20");Cheonan_terminal_cam.add("15:40");
-                    Cheonan_terminal_cam.add("16:00");Cheonan_terminal_cam.add("16:10");Cheonan_terminal_cam.add("16:30");Cheonan_terminal_cam.add("17:00");Cheonan_terminal_cam.add("17:10");
-                    Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("17:50");Cheonan_terminal_cam.add("18:00");Cheonan_terminal_cam.add("18:15");Cheonan_terminal_cam.add("18:40");
-                    Cheonan_terminal_cam.add("19:00");Cheonan_terminal_cam.add("19:20");Cheonan_terminal_cam.add("19:40");Cheonan_terminal_cam.add("20:10");Cheonan_terminal_cam.add("20:40");
-                    Cheonan_terminal_cam.add("21:20");Cheonan_terminal_cam.add("22:00");
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("07:45"); cam_Cheonan_terminal.add("08:10"); cam_Cheonan_terminal.add("08:20"); cam_Cheonan_terminal.add("09:10"); cam_Cheonan_terminal.add("09:25");
-                    cam_Cheonan_terminal.add("09:45"); cam_Cheonan_terminal.add("10:05"); cam_Cheonan_terminal.add("10:30"); cam_Cheonan_terminal.add("11:00"); cam_Cheonan_terminal.add("11:30");
-                    cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("12:30"); cam_Cheonan_terminal.add("13:00"); cam_Cheonan_terminal.add("13:30"); cam_Cheonan_terminal.add("14:00");
-                    cam_Cheonan_terminal.add("14:30"); cam_Cheonan_terminal.add("14:50"); cam_Cheonan_terminal.add("15:10"); cam_Cheonan_terminal.add("15:30"); cam_Cheonan_terminal.add("15:40");
-                    cam_Cheonan_terminal.add("16:00"); cam_Cheonan_terminal.add("16:30"); cam_Cheonan_terminal.add("16:40"); cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("17:20");
-                    cam_Cheonan_terminal.add("17:30"); cam_Cheonan_terminal.add("17:45"); cam_Cheonan_terminal.add("18:10"); cam_Cheonan_terminal.add("18:30"); cam_Cheonan_terminal.add("18:50");
-                    cam_Cheonan_terminal.add("19:10"); cam_Cheonan_terminal.add("19:40"); cam_Cheonan_terminal.add("20:10"); cam_Cheonan_terminal.add("20:50"); cam_Cheonan_terminal.add("21:30");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(day_asan);
+                        empty_array4.addAll(day_asan_rev);
                     }
-                    if(R.id.choice_b == curr_Day) {
-                        //System.out.println(dayday);
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(day_cheonan);
+                        empty_array4.addAll(day_cheonan_rev);
+                    }
+
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(day_terminal);
+                        empty_array4.addAll(day_terminal_rev);
+                    }
+
+                    int Textview_num1 = empty_array3.size();
+                    int Textview_num2 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num1];
+                    textViews2 = new TextView[Textview_num2];
+
+                    for(int i = 0;i<Textview_num1;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num2;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_b == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
                     }
                     else
                     {
@@ -463,305 +1178,207 @@ public class Frag3 extends Fragment {
                     }
 
                 }
-
-                else if( (checkedId == R.id.choice_c))
+                if( (checkedId == R.id.choice_c))
                 {
-                    //array_reset();
-
-                    asan_cam = new ArrayList<>();
-                    asan_cam.add("08:40");asan_cam.add("08:50");asan_cam.add("08:55");asan_cam.add("09:05");asan_cam.add("09:15");
-                    asan_cam.add("09:55");asan_cam.add("10:15");asan_cam.add("10:45");asan_cam.add("11:10");asan_cam.add("11:20");
-                    asan_cam.add("11:50");asan_cam.add("12:05");asan_cam.add("12:20");asan_cam.add("12:45");asan_cam.add("13:15");
-                    asan_cam.add("13:45");asan_cam.add("14:15");asan_cam.add("14:45");asan_cam.add("15:15");asan_cam.add("15:40");
-                    asan_cam.add("15:50");asan_cam.add("16:15");asan_cam.add("16:40");asan_cam.add("16:55");asan_cam.add("17:20");
-                    asan_cam.add("17:40");asan_cam.add("17:50");asan_cam.add("18:10");asan_cam.add("18:35");asan_cam.add("18:45");
-                    asan_cam.add("19:45");asan_cam.add("20:05");asan_cam.add("20:25");asan_cam.add("20:45");asan_cam.add("21:05");
-                    asan_cam.add("21:25");asan_cam.add("21:45");asan_cam.add("22:15");
-
-                    cam_asan = new ArrayList<>();
-                    cam_asan.add("08:40");cam_asan.add("09:45");cam_asan.add("10:05");cam_asan.add("10:35");cam_asan.add("11:10");
-                    cam_asan.add("11:40");cam_asan.add("11:55");cam_asan.add("12:10");cam_asan.add("12:35");cam_asan.add("13:05");
-                    cam_asan.add("13:35");cam_asan.add("14:05");cam_asan.add("14:35");cam_asan.add("15:05");cam_asan.add("15:30");
-                    cam_asan.add("15:40");cam_asan.add("16:05");cam_asan.add("16:30");cam_asan.add("16:45");cam_asan.add("17:10");
-                    cam_asan.add("17:30");cam_asan.add("17:40");cam_asan.add("18:00");cam_asan.add("18:25");cam_asan.add("18:35");
-                    cam_asan.add("19:00");cam_asan.add("19:20");cam_asan.add("19:40");cam_asan.add("20:00");cam_asan.add("20:20");
-                    cam_asan.add("20:40");cam_asan.add("21:00");cam_asan.add("21:30");
-
-                    Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("08:15");Cheonan_cam.add("08:35");Cheonan_cam.add("08:45");Cheonan_cam.add("08:50");Cheonan_cam.add("08:53");
-                    Cheonan_cam.add("08:56");Cheonan_cam.add("08:58");Cheonan_cam.add("09:00");Cheonan_cam.add("09:03");Cheonan_cam.add("09:10");
-                    Cheonan_cam.add("09:50");Cheonan_cam.add("10:00");Cheonan_cam.add("10:20");Cheonan_cam.add("10:40");Cheonan_cam.add("10:50");
-                    Cheonan_cam.add("10:55");Cheonan_cam.add("11:00");Cheonan_cam.add("11:10");Cheonan_cam.add("11:40");Cheonan_cam.add("12:00");
-                    Cheonan_cam.add("12:05");Cheonan_cam.add("12:30");Cheonan_cam.add("13:00");Cheonan_cam.add("13:30");Cheonan_cam.add("14:00");
-                    Cheonan_cam.add("14:30");Cheonan_cam.add("15:00");Cheonan_cam.add("15:30");Cheonan_cam.add("15:40");Cheonan_cam.add("15:50");
-                    Cheonan_cam.add("16:00");Cheonan_cam.add("16:20");Cheonan_cam.add("16:55");Cheonan_cam.add("17:05");Cheonan_cam.add("17:25");
-                    Cheonan_cam.add("17:50");Cheonan_cam.add("18:00");Cheonan_cam.add("18:15");Cheonan_cam.add("18:40");Cheonan_cam.add("18:55");
-                    Cheonan_cam.add("19:05");Cheonan_cam.add("19:30");Cheonan_cam.add("19:50");Cheonan_cam.add("20:10");Cheonan_cam.add("20:30");
-                    Cheonan_cam.add("20:50");Cheonan_cam.add("21:10");Cheonan_cam.add("21:30");Cheonan_cam.add("22:20");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("08:15");cam_Cheonan.add("09:35");cam_Cheonan.add("09:55");cam_Cheonan.add("10:35");cam_Cheonan.add("11:15");
-                    cam_Cheonan.add("11:40");cam_Cheonan.add("12:10");cam_Cheonan.add("12:40");cam_Cheonan.add("13:10");cam_Cheonan.add("13:40");
-                    cam_Cheonan.add("14:10");cam_Cheonan.add("14:40");cam_Cheonan.add("15:10");cam_Cheonan.add("15:20");cam_Cheonan.add("15:30");
-                    cam_Cheonan.add("15:40");cam_Cheonan.add("16:00");cam_Cheonan.add("16:30");cam_Cheonan.add("16:40");cam_Cheonan.add("17:00");
-                    cam_Cheonan.add("17:20");cam_Cheonan.add("17:30");cam_Cheonan.add("17:45");cam_Cheonan.add("18:10");cam_Cheonan.add("18:25");
-                    cam_Cheonan.add("18:35");cam_Cheonan.add("19:00");cam_Cheonan.add("19:20");cam_Cheonan.add("19:40");cam_Cheonan.add("20:00");
-                    cam_Cheonan.add("20:20");cam_Cheonan.add("20:40");cam_Cheonan.add("21:00");cam_Cheonan.add("21:30");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("08:10");Cheonan_terminal_cam.add("08:25");Cheonan_terminal_cam.add("08:35");Cheonan_terminal_cam.add("08:40");Cheonan_terminal_cam.add("08:45");
-                    Cheonan_terminal_cam.add("08:50");Cheonan_terminal_cam.add("08:55");Cheonan_terminal_cam.add("09:00");Cheonan_terminal_cam.add("09:40");Cheonan_terminal_cam.add("09:55");
-                    Cheonan_terminal_cam.add("10:15");Cheonan_terminal_cam.add("10:35");Cheonan_terminal_cam.add("10:50");Cheonan_terminal_cam.add("11:00");Cheonan_terminal_cam.add("11:30");
-                    Cheonan_terminal_cam.add("11:45");Cheonan_terminal_cam.add("12:00");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:00");Cheonan_terminal_cam.add("13:30");
-                    Cheonan_terminal_cam.add("14:00");Cheonan_terminal_cam.add("14:30");Cheonan_terminal_cam.add("15:00");Cheonan_terminal_cam.add("15:20");Cheonan_terminal_cam.add("15:40");
-                    Cheonan_terminal_cam.add("16:00");Cheonan_terminal_cam.add("16:10");Cheonan_terminal_cam.add("16:30");Cheonan_terminal_cam.add("17:00");Cheonan_terminal_cam.add("17:10");
-                    Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("17:50");Cheonan_terminal_cam.add("18:00");Cheonan_terminal_cam.add("18:15");Cheonan_terminal_cam.add("18:40");
-                    Cheonan_terminal_cam.add("19:00");Cheonan_terminal_cam.add("19:20");Cheonan_terminal_cam.add("19:40");Cheonan_terminal_cam.add("20:10");Cheonan_terminal_cam.add("20:40");
-                    Cheonan_terminal_cam.add("21:20");Cheonan_terminal_cam.add("22:00");
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("07:45"); cam_Cheonan_terminal.add("08:10"); cam_Cheonan_terminal.add("08:20"); cam_Cheonan_terminal.add("09:10"); cam_Cheonan_terminal.add("09:25");
-                    cam_Cheonan_terminal.add("09:45"); cam_Cheonan_terminal.add("10:05"); cam_Cheonan_terminal.add("10:30"); cam_Cheonan_terminal.add("11:00"); cam_Cheonan_terminal.add("11:30");
-                    cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("12:30"); cam_Cheonan_terminal.add("13:00"); cam_Cheonan_terminal.add("13:30"); cam_Cheonan_terminal.add("14:00");
-                    cam_Cheonan_terminal.add("14:30"); cam_Cheonan_terminal.add("14:50"); cam_Cheonan_terminal.add("15:10"); cam_Cheonan_terminal.add("15:30"); cam_Cheonan_terminal.add("15:40");
-                    cam_Cheonan_terminal.add("16:00"); cam_Cheonan_terminal.add("16:30"); cam_Cheonan_terminal.add("16:40"); cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("17:20");
-                    cam_Cheonan_terminal.add("17:30"); cam_Cheonan_terminal.add("17:45"); cam_Cheonan_terminal.add("18:10"); cam_Cheonan_terminal.add("18:30"); cam_Cheonan_terminal.add("18:50");
-                    cam_Cheonan_terminal.add("19:10"); cam_Cheonan_terminal.add("19:40"); cam_Cheonan_terminal.add("20:10"); cam_Cheonan_terminal.add("20:50"); cam_Cheonan_terminal.add("21:30");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(day_asan);
+                        empty_array4.addAll(day_asan_rev);
                     }
-                    if(R.id.choice_c == curr_Day) {
-                        //System.out.println(dayday);
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(day_cheonan);
+                        empty_array4.addAll(day_cheonan_rev);
+                    }
+
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(day_terminal);
+                        empty_array4.addAll(day_terminal_rev);
+                    }
+
+                    int Textview_num1 = empty_array3.size();
+                    int Textview_num2 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num1];
+                    textViews2 = new TextView[Textview_num2];
+
+                    for(int i = 0;i<Textview_num1;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num2;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_c == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
                     }
                     else
                     {
                         scroll_set();
                     }
                 }
-
-                else if( (checkedId == R.id.choice_d))
+                if( (checkedId == R.id.choice_d))
                 {
-                    //array_reset();
-
-                    asan_cam = new ArrayList<>();
-                    asan_cam.add("08:40");asan_cam.add("08:50");asan_cam.add("08:55");asan_cam.add("09:05");asan_cam.add("09:15");
-                    asan_cam.add("09:55");asan_cam.add("10:15");asan_cam.add("10:45");asan_cam.add("11:10");asan_cam.add("11:20");
-                    asan_cam.add("11:50");asan_cam.add("12:05");asan_cam.add("12:20");asan_cam.add("12:45");asan_cam.add("13:15");
-                    asan_cam.add("13:45");asan_cam.add("14:15");asan_cam.add("14:45");asan_cam.add("15:15");asan_cam.add("15:40");
-                    asan_cam.add("15:50");asan_cam.add("16:15");asan_cam.add("16:40");asan_cam.add("16:55");asan_cam.add("17:20");
-                    asan_cam.add("17:40");asan_cam.add("17:50");asan_cam.add("18:10");asan_cam.add("18:35");asan_cam.add("18:45");
-                    asan_cam.add("19:45");asan_cam.add("20:05");asan_cam.add("20:25");asan_cam.add("20:45");asan_cam.add("21:05");
-                    asan_cam.add("21:25");asan_cam.add("21:45");asan_cam.add("22:15");
-
-                    cam_asan = new ArrayList<>();
-                    cam_asan.add("08:40");cam_asan.add("09:45");cam_asan.add("10:05");cam_asan.add("10:35");cam_asan.add("11:10");
-                    cam_asan.add("11:40");cam_asan.add("11:55");cam_asan.add("12:10");cam_asan.add("12:35");cam_asan.add("13:05");
-                    cam_asan.add("13:35");cam_asan.add("14:05");cam_asan.add("14:35");cam_asan.add("15:05");cam_asan.add("15:30");
-                    cam_asan.add("15:40");cam_asan.add("16:05");cam_asan.add("16:30");cam_asan.add("16:45");cam_asan.add("17:10");
-                    cam_asan.add("17:30");cam_asan.add("17:40");cam_asan.add("18:00");cam_asan.add("18:25");cam_asan.add("18:35");
-                    cam_asan.add("19:00");cam_asan.add("19:20");cam_asan.add("19:40");cam_asan.add("20:00");cam_asan.add("20:20");
-                    cam_asan.add("20:40");cam_asan.add("21:00");cam_asan.add("21:30");
-
-                    Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("08:15");Cheonan_cam.add("08:35");Cheonan_cam.add("08:45");Cheonan_cam.add("08:50");Cheonan_cam.add("08:53");
-                    Cheonan_cam.add("08:56");Cheonan_cam.add("08:58");Cheonan_cam.add("09:00");Cheonan_cam.add("09:03");Cheonan_cam.add("09:10");
-                    Cheonan_cam.add("09:50");Cheonan_cam.add("10:00");Cheonan_cam.add("10:20");Cheonan_cam.add("10:40");Cheonan_cam.add("10:50");
-                    Cheonan_cam.add("10:55");Cheonan_cam.add("11:00");Cheonan_cam.add("11:10");Cheonan_cam.add("11:40");Cheonan_cam.add("12:00");
-                    Cheonan_cam.add("12:05");Cheonan_cam.add("12:30");Cheonan_cam.add("13:00");Cheonan_cam.add("13:30");Cheonan_cam.add("14:00");
-                    Cheonan_cam.add("14:30");Cheonan_cam.add("15:00");Cheonan_cam.add("15:30");Cheonan_cam.add("15:40");Cheonan_cam.add("15:50");
-                    Cheonan_cam.add("16:00");Cheonan_cam.add("16:20");Cheonan_cam.add("16:55");Cheonan_cam.add("17:05");Cheonan_cam.add("17:25");
-                    Cheonan_cam.add("17:50");Cheonan_cam.add("18:00");Cheonan_cam.add("18:15");Cheonan_cam.add("18:40");Cheonan_cam.add("18:55");
-                    Cheonan_cam.add("19:05");Cheonan_cam.add("19:30");Cheonan_cam.add("19:50");Cheonan_cam.add("20:10");Cheonan_cam.add("20:30");
-                    Cheonan_cam.add("20:50");Cheonan_cam.add("21:10");Cheonan_cam.add("21:30");Cheonan_cam.add("22:20");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("08:15");cam_Cheonan.add("09:35");cam_Cheonan.add("09:55");cam_Cheonan.add("10:35");cam_Cheonan.add("11:15");
-                    cam_Cheonan.add("11:40");cam_Cheonan.add("12:10");cam_Cheonan.add("12:40");cam_Cheonan.add("13:10");cam_Cheonan.add("13:40");
-                    cam_Cheonan.add("14:10");cam_Cheonan.add("14:40");cam_Cheonan.add("15:10");cam_Cheonan.add("15:20");cam_Cheonan.add("15:30");
-                    cam_Cheonan.add("15:40");cam_Cheonan.add("16:00");cam_Cheonan.add("16:30");cam_Cheonan.add("16:40");cam_Cheonan.add("17:00");
-                    cam_Cheonan.add("17:20");cam_Cheonan.add("17:30");cam_Cheonan.add("17:45");cam_Cheonan.add("18:10");cam_Cheonan.add("18:25");
-                    cam_Cheonan.add("18:35");cam_Cheonan.add("19:00");cam_Cheonan.add("19:20");cam_Cheonan.add("19:40");cam_Cheonan.add("20:00");
-                    cam_Cheonan.add("20:20");cam_Cheonan.add("20:40");cam_Cheonan.add("21:00");cam_Cheonan.add("21:30");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("08:10");Cheonan_terminal_cam.add("08:25");Cheonan_terminal_cam.add("08:35");Cheonan_terminal_cam.add("08:40");Cheonan_terminal_cam.add("08:45");
-                    Cheonan_terminal_cam.add("08:50");Cheonan_terminal_cam.add("08:55");Cheonan_terminal_cam.add("09:00");Cheonan_terminal_cam.add("09:40");Cheonan_terminal_cam.add("09:55");
-                    Cheonan_terminal_cam.add("10:15");Cheonan_terminal_cam.add("10:35");Cheonan_terminal_cam.add("10:50");Cheonan_terminal_cam.add("11:00");Cheonan_terminal_cam.add("11:30");
-                    Cheonan_terminal_cam.add("11:45");Cheonan_terminal_cam.add("12:00");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:00");Cheonan_terminal_cam.add("13:30");
-                    Cheonan_terminal_cam.add("14:00");Cheonan_terminal_cam.add("14:30");Cheonan_terminal_cam.add("15:00");Cheonan_terminal_cam.add("15:20");Cheonan_terminal_cam.add("15:40");
-                    Cheonan_terminal_cam.add("16:00");Cheonan_terminal_cam.add("16:10");Cheonan_terminal_cam.add("16:30");Cheonan_terminal_cam.add("17:00");Cheonan_terminal_cam.add("17:10");
-                    Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("17:50");Cheonan_terminal_cam.add("18:00");Cheonan_terminal_cam.add("18:15");Cheonan_terminal_cam.add("18:40");
-                    Cheonan_terminal_cam.add("19:00");Cheonan_terminal_cam.add("19:20");Cheonan_terminal_cam.add("19:40");Cheonan_terminal_cam.add("20:10");Cheonan_terminal_cam.add("20:40");
-                    Cheonan_terminal_cam.add("21:20");Cheonan_terminal_cam.add("22:00");
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("07:45"); cam_Cheonan_terminal.add("08:10"); cam_Cheonan_terminal.add("08:20"); cam_Cheonan_terminal.add("09:10"); cam_Cheonan_terminal.add("09:25");
-                    cam_Cheonan_terminal.add("09:45"); cam_Cheonan_terminal.add("10:05"); cam_Cheonan_terminal.add("10:30"); cam_Cheonan_terminal.add("11:00"); cam_Cheonan_terminal.add("11:30");
-                    cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("12:30"); cam_Cheonan_terminal.add("13:00"); cam_Cheonan_terminal.add("13:30"); cam_Cheonan_terminal.add("14:00");
-                    cam_Cheonan_terminal.add("14:30"); cam_Cheonan_terminal.add("14:50"); cam_Cheonan_terminal.add("15:10"); cam_Cheonan_terminal.add("15:30"); cam_Cheonan_terminal.add("15:40");
-                    cam_Cheonan_terminal.add("16:00"); cam_Cheonan_terminal.add("16:30"); cam_Cheonan_terminal.add("16:40"); cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("17:20");
-                    cam_Cheonan_terminal.add("17:30"); cam_Cheonan_terminal.add("17:45"); cam_Cheonan_terminal.add("18:10"); cam_Cheonan_terminal.add("18:30"); cam_Cheonan_terminal.add("18:50");
-                    cam_Cheonan_terminal.add("19:10"); cam_Cheonan_terminal.add("19:40"); cam_Cheonan_terminal.add("20:10"); cam_Cheonan_terminal.add("20:50"); cam_Cheonan_terminal.add("21:30");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(day_asan);
+                        empty_array4.addAll(day_asan_rev);
                     }
-                    if(R.id.choice_d == curr_Day) {
-                        //System.out.println(dayday);
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(day_cheonan);
+                        empty_array4.addAll(day_cheonan_rev);
+                    }
+
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(day_terminal);
+                        empty_array4.addAll(day_terminal_rev);
+                    }
+
+                    int Textview_num1 = empty_array3.size();
+                    int Textview_num2 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num1];
+                    textViews2 = new TextView[Textview_num2];
+
+                    for(int i = 0;i<Textview_num1;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num2;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_d == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
                     }
                     else
                     {
                         scroll_set();
                     }
-
                 }
-
-                else if(checkedId == R.id.choice_e)
+                if(checkedId == R.id.choice_e)
                 {
-                    //array_reset();
-
-                    asan_cam = new ArrayList<>();
-                    asan_cam.add("08:40");asan_cam.add("08:50");asan_cam.add("08:55");asan_cam.add("09:05");asan_cam.add("09:15");
-                    asan_cam.add("09:55");asan_cam.add("10:15");asan_cam.add("10:45");asan_cam.add("11:05");asan_cam.add("11:20");
-                    asan_cam.add("11:50");asan_cam.add("12:20");asan_cam.add("12:45");asan_cam.add("13:15");
-                    asan_cam.add("13:45");asan_cam.add("14:15");asan_cam.add("14:45");asan_cam.add("15:15");asan_cam.add("15:40");
-                    asan_cam.add("16:15");asan_cam.add("16:40");asan_cam.add("17:20");
-                    asan_cam.add("17:40");asan_cam.add("18:10");asan_cam.add("18:45");
-                    asan_cam.add("19:45");asan_cam.add("20:05");asan_cam.add("20:25");asan_cam.add("20:45");asan_cam.add("21:05");
-                    asan_cam.add("21:25");asan_cam.add("21:45");asan_cam.add("22:15");
-
-                    cam_asan = new ArrayList<>();
-                    cam_asan.add("08:40");cam_asan.add("09:45");cam_asan.add("10:05");cam_asan.add("10:35");cam_asan.add("11:10");
-                    cam_asan.add("11:40");cam_asan.add("12:10");cam_asan.add("12:35");cam_asan.add("13:05");cam_asan.add("13:35");
-                    cam_asan.add("14:05");cam_asan.add("14:35");cam_asan.add("15:05");cam_asan.add("15:30");cam_asan.add("16:05");
-                    cam_asan.add("16:30");asan_cam.add("17:10");cam_asan.add("17:30");cam_asan.add("18:00");cam_asan.add("18:35");
-                    cam_asan.add("19:00");cam_asan.add("19:20");cam_asan.add("19:40");cam_asan.add("20:00");cam_asan.add("20:20");
-                    cam_asan.add("20:40");cam_asan.add("21:00");cam_asan.add("21:30");
-
-                    Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("08:15");Cheonan_cam.add("08:35");Cheonan_cam.add("08:45");Cheonan_cam.add("08:50");Cheonan_cam.add("09:00");
-                    Cheonan_cam.add("09:10");Cheonan_cam.add("09:50");Cheonan_cam.add("10:00");Cheonan_cam.add("10:20");Cheonan_cam.add("10:40");
-                    Cheonan_cam.add("11:00");Cheonan_cam.add("11:10");Cheonan_cam.add("11:40");Cheonan_cam.add("12:00");Cheonan_cam.add("12:05");
-                    Cheonan_cam.add("12:30");Cheonan_cam.add("13:00");Cheonan_cam.add("13:30");Cheonan_cam.add("14:00");Cheonan_cam.add("14:30");
-                    Cheonan_cam.add("15:00");Cheonan_cam.add("15:30");Cheonan_cam.add("15:50");Cheonan_cam.add("16:20");Cheonan_cam.add("16:55");
-                    Cheonan_cam.add("17:25");Cheonan_cam.add("18:00");Cheonan_cam.add("18:40");Cheonan_cam.add("19:05");Cheonan_cam.add("19:30");
-                    Cheonan_cam.add("19:50");Cheonan_cam.add("20:10");Cheonan_cam.add("20:30");Cheonan_cam.add("20:50");Cheonan_cam.add("21:10");
-                    Cheonan_cam.add("21:30");Cheonan_cam.add("22:00");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("08:15");cam_Cheonan.add("09:35");cam_Cheonan.add("09:55");cam_Cheonan.add("10:35");cam_Cheonan.add("11:15");
-                    cam_Cheonan.add("11:40");cam_Cheonan.add("12:10");cam_Cheonan.add("12:40");cam_Cheonan.add("13:10");cam_Cheonan.add("13:40");
-                    cam_Cheonan.add("14:10");cam_Cheonan.add("14:40");cam_Cheonan.add("15:10");cam_Cheonan.add("15:30");cam_Cheonan.add("16:00");
-                    cam_Cheonan.add("16:30");cam_Cheonan.add("17:00");cam_Cheonan.add("17:30");cam_Cheonan.add("18:10");cam_Cheonan.add("18:35");
-                    cam_Cheonan.add("19:00");cam_Cheonan.add("19:20");cam_Cheonan.add("19:40");cam_Cheonan.add("20:00");cam_Cheonan.add("20:20");
-                    cam_Cheonan.add("20:40");cam_Cheonan.add("21:00");cam_Cheonan.add("21:30");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("08:10");Cheonan_terminal_cam.add("08:25");Cheonan_terminal_cam.add("08:35");Cheonan_terminal_cam.add("08:50");Cheonan_terminal_cam.add("09:00");
-                    Cheonan_terminal_cam.add("09:40");Cheonan_terminal_cam.add("09:55");Cheonan_terminal_cam.add("10:15");Cheonan_terminal_cam.add("10:35");Cheonan_terminal_cam.add("11:00");
-                    Cheonan_terminal_cam.add("11:30");Cheonan_terminal_cam.add("12:00");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:00");Cheonan_terminal_cam.add("13:30");
-                    Cheonan_terminal_cam.add("14:00");Cheonan_terminal_cam.add("14:30");Cheonan_terminal_cam.add("15:00");Cheonan_terminal_cam.add("15:20");Cheonan_terminal_cam.add("15:40");
-                    Cheonan_terminal_cam.add("16:00");Cheonan_terminal_cam.add("16:30");Cheonan_terminal_cam.add("17:00");Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("18:00");
-                    Cheonan_terminal_cam.add("18:40");Cheonan_terminal_cam.add("19:00");Cheonan_terminal_cam.add("19:20");Cheonan_terminal_cam.add("19:40");Cheonan_terminal_cam.add("20:10");
-                    Cheonan_terminal_cam.add("20:40");Cheonan_terminal_cam.add("21:20");Cheonan_terminal_cam.add("22:00");
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("07:45"); cam_Cheonan_terminal.add("08:10"); cam_Cheonan_terminal.add("08:20"); cam_Cheonan_terminal.add("09:10"); cam_Cheonan_terminal.add("09:25");
-                    cam_Cheonan_terminal.add("09:45"); cam_Cheonan_terminal.add("10:05"); cam_Cheonan_terminal.add("10:30"); cam_Cheonan_terminal.add("11:00"); cam_Cheonan_terminal.add("11:30");
-                    cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("12:30"); cam_Cheonan_terminal.add("13:00"); cam_Cheonan_terminal.add("13:30"); cam_Cheonan_terminal.add("14:00");
-                    cam_Cheonan_terminal.add("14:30"); cam_Cheonan_terminal.add("14:50"); cam_Cheonan_terminal.add("15:10"); cam_Cheonan_terminal.add("15:30"); cam_Cheonan_terminal.add("16:00");
-                    cam_Cheonan_terminal.add("16:30"); cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("17:30"); cam_Cheonan_terminal.add("18:10"); cam_Cheonan_terminal.add("18:30");
-                    cam_Cheonan_terminal.add("18:50"); cam_Cheonan_terminal.add("19:10"); cam_Cheonan_terminal.add("19:40"); cam_Cheonan_terminal.add("20:10"); cam_Cheonan_terminal.add("20:50");
-                    cam_Cheonan_terminal.add("21:30");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(fri_asan);
+                        empty_array4.addAll(fri_asan_rev);
                     }
 
-                    if(R.id.choice_e == curr_Day) {
-                        //System.out.println(dayday);
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(fri_cheonan);
+                        empty_array4.addAll(fri_cheonan_rev);
+                    }
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(fri_terminal);
+                        empty_array4.addAll(fri_terminal_rev);
+                    }
+
+                    int Textview_num1 = empty_array3.size();
+                    int Textview_num2 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num1];
+                    textViews2 = new TextView[Textview_num2];
+
+                    for(int i = 0;i<Textview_num1;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num2;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_e == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
                     }
                     else
                     {
@@ -769,150 +1386,146 @@ public class Frag3 extends Fragment {
                     }
 
                 }
-                else if(checkedId == R.id.choice_f)
+                if(checkedId == R.id.choice_f)
                 {
-                    //array_reset();
-
-                    asan_cam = new ArrayList<>();
-                    asan_cam.add("08:45");asan_cam.add("09:45");asan_cam.add("10:45");asan_cam.add("12:45");asan_cam.add("13:45");
-                    asan_cam.add("15:45");asan_cam.add("17:45");asan_cam.add("18:45");asan_cam.add("19:45");asan_cam.add("20:45");
-
-                    cam_asan = new ArrayList<>();
-                    cam_asan.add("08:00");cam_asan.add("09:00");cam_asan.add("10:00");cam_asan.add("12:00"); cam_asan.add("13:00");
-                    cam_asan.add("15:00");cam_asan.add("17:00");cam_asan.add("18:00");cam_asan.add("19:00");cam_asan.add("20:00");
-
-                    Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("08:30");Cheonan_cam.add("09:30");Cheonan_cam.add("10:30");Cheonan_cam.add("12:30");Cheonan_cam.add("13:30");
-                    Cheonan_cam.add("15:30");Cheonan_cam.add("17:30");Cheonan_cam.add("18:30");Cheonan_cam.add("19:30");Cheonan_cam.add("20:30");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("08:00");cam_Cheonan.add("09:00");cam_Cheonan.add("10:00");cam_Cheonan.add("12:00");cam_Cheonan.add("13:00");
-                    cam_Cheonan.add("15:00");cam_Cheonan.add("17:00");cam_Cheonan.add("18:00");cam_Cheonan.add("19:00");cam_Cheonan.add("20:00");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("08:30");Cheonan_terminal_cam.add("09:30");Cheonan_terminal_cam.add("10:30");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:30");
-                    Cheonan_terminal_cam.add("15:30");Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("18:30");Cheonan_terminal_cam.add("19:30");Cheonan_terminal_cam.add("20:30");
-
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("08:00"); cam_Cheonan_terminal.add("09:00"); cam_Cheonan_terminal.add("10:00"); cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("13:00");
-                    cam_Cheonan_terminal.add("15:00"); cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("18:00"); cam_Cheonan_terminal.add("19:00"); cam_Cheonan_terminal.add("20:00");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(sat_cheonan_asan);
+                        empty_array4.addAll(sat_asan_rev);
                     }
 
-                    if(R.id.choice_f == curr_Day) {
-                        //System.out.println(dayday);
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(sat_cheonan_asan);
+                        empty_array4.addAll(sat_cheonan_rev);
+                    }
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(sat_terminal);
+                        empty_array4.addAll(sat_terminal_rev);
+                    }
+
+                    int Textview_num1 = empty_array3.size();
+                    int Textview_num2 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num1];
+                    textViews2 = new TextView[Textview_num2];
+
+                    for(int i = 0;i<Textview_num1;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num2;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_f == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
                     }
                     else
                     {
                         scroll_set();
                     }
                 }
-                else if(checkedId == R.id.choice_g)
+                if(checkedId == R.id.choice_g)
                 {
-
-                    //array_reset();
-
-                    asan_cam = new ArrayList<>();
-                    asan_cam.add("09:45");asan_cam.add("10:35");asan_cam.add("12:45");asan_cam.add("13:45");asan_cam.add("15:45");
-                    asan_cam.add("17:45");asan_cam.add("18:45");asan_cam.add("19:45");asan_cam.add("20:25");asan_cam.add("21:10");
-                    asan_cam.add("21:35");asan_cam.add("21:45");
-
-                    cam_asan = new ArrayList<>();
-                    cam_asan.add("09:00");cam_asan.add("09:50");cam_asan.add("12:00");cam_asan.add("13:00");cam_asan.add("15:00");
-                    cam_asan.add("17:00");cam_asan.add("18:00");cam_asan.add("19:00");cam_asan.add("19:40");cam_asan.add("20:25");
-                    cam_asan.add("20:50");cam_asan.add("21:00");
-
-                    Cheonan_cam = new ArrayList<>();
-                    Cheonan_cam.add("09:30");Cheonan_cam.add("10:20");Cheonan_cam.add("12:30");Cheonan_cam.add("13:30");Cheonan_cam.add("15:30");
-                    Cheonan_cam.add("17:30");Cheonan_cam.add("18:30");Cheonan_cam.add("19:30");Cheonan_cam.add("20:10");Cheonan_cam.add("20:55");
-                    Cheonan_cam.add("20:20");Cheonan_cam.add("21:30");
-
-                    cam_Cheonan = new ArrayList<>();
-                    cam_Cheonan.add("09:00");cam_Cheonan.add("09:50");cam_Cheonan.add("12:00");cam_Cheonan.add("13:00");cam_Cheonan.add("15:00");
-                    cam_Cheonan.add("17:00");cam_Cheonan.add("18:00");cam_Cheonan.add("19:00");cam_Cheonan.add("19:40");cam_Cheonan.add("20:25");
-                    cam_Cheonan.add("20:50");cam_Cheonan.add("21:00");
-
-                    Cheonan_terminal_cam = new ArrayList<>();
-                    Cheonan_terminal_cam.add("09:30");Cheonan_terminal_cam.add("10:20");Cheonan_terminal_cam.add("12:30");Cheonan_terminal_cam.add("13:30");Cheonan_terminal_cam.add("15:30");
-                    Cheonan_terminal_cam.add("17:30");Cheonan_terminal_cam.add("18:30");Cheonan_terminal_cam.add("19:30");Cheonan_terminal_cam.add("20:20");Cheonan_terminal_cam.add("20:50");
-                    Cheonan_terminal_cam.add("21:20");Cheonan_terminal_cam.add("21:30");
-
-                    cam_Cheonan_terminal = new ArrayList<>();
-                    cam_Cheonan_terminal.add("09:00"); cam_Cheonan_terminal.add("09:50"); cam_Cheonan_terminal.add("12:00"); cam_Cheonan_terminal.add("13:00"); cam_Cheonan_terminal.add("15:00");
-                    cam_Cheonan_terminal.add("17:00"); cam_Cheonan_terminal.add("18:00"); cam_Cheonan_terminal.add("19:00"); cam_Cheonan_terminal.add("19:50"); cam_Cheonan_terminal.add("20:20");
-                    cam_Cheonan_terminal.add("20:50"); cam_Cheonan_terminal.add("21:00");
-
-                    switch (singleSelectToggleGroup2.getCheckedId())
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_osan)
                     {
-                        case R.id.choice_osan:
-                            textView.setText(Arrays.toString(new ArrayList[]{asan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_asan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
-                        case R.id.choice_Cheonan_terminal:
-                            textView.setText(Arrays.toString(new ArrayList[]{Cheonan_terminal_cam}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            textView2.setText(Arrays.toString(new ArrayList[]{cam_Cheonan_terminal}).replaceAll("\\[|\\]", " ").replace(",","     "),TextView.BufferType.SPANNABLE);
-                            break;
+                        empty_array3.addAll(sun_cheonan_asan);
+                        empty_array4.addAll(sun_asan_rev);
                     }
 
-                    if(R.id.choice_g == curr_Day) {
-                        //System.out.println(dayday);
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan)
+                    {
+                        empty_array3.addAll(sun_cheonan_asan);
+                        empty_array4.addAll(sun_cheonan_rev);
+                    }
 
-                        switch (singleSelectToggleGroup2.getCheckedId()) {
-                            case R.id.choice_osan:
-                                current_asan_cam();
-                                current_cam_osan();
-                                break;
-                            case R.id.choice_Cheonan:
-                                current_Cheonan_cam();
-                                current_cam_Cheonan();
-                                break;
-                            case R.id.choice_Cheonan_terminal:
-                                current_Cheonan_terminal_cam();
-                                current_cam_Cheonan_terminal();
-                                break;
-                        }
+                    if(singleSelectToggleGroup2.getCheckedId() == R.id.choice_Cheonan_terminal)
+                    {
+                        empty_array3.addAll(sun_terminal);
+                        empty_array4.addAll(sun_terminal_rev);
+                    }
+
+                    int Textview_num1 = empty_array3.size();
+                    int Textview_num2 = empty_array4.size();
+
+                    textViews1 = new TextView[Textview_num1];
+                    textViews2 = new TextView[Textview_num2];
+
+
+
+                    for(int i = 0;i<Textview_num1;i++)
+                    {
+                        textViews1[i] = new TextView(getActivity());
+                        textViews1[i].setText(empty_array3.get(i));
+                        textViews1[i].setGravity(Gravity.CENTER);
+                        textViews1[i].setTextColor(Color.rgb(169,169,169));
+                        textViews1[i].setTextSize(25);
+                        textViews1[i].setHeight(190);
+
+                        scroll_vertical_layout1.addView(textViews1[i]);
+                    }
+
+                    for(int i = 0;i<Textview_num2;i++)
+                    {
+                        textViews2[i] = new TextView(getActivity());
+                        textViews2[i].setText(empty_array4.get(i));
+                        textViews2[i].setGravity(Gravity.CENTER);
+                        textViews2[i].setTextColor(Color.rgb(169,169,169));
+                        textViews2[i].setTextSize(25);
+                        textViews2[i].setHeight(190);
+
+                        scroll_vertical_layout2.addView(textViews2[i]);
+                    }
+
+                    if(R.id.choice_g == curr_Day)
+                    {
+                        int x = current_time(empty_array3);
+                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout1.removeViewAt(x);
+                        scroll_vertical_layout1.addView( textViews1[x],x);
+
+                        int y = current_time(empty_array4);
+                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+                        scroll_vertical_layout2.removeViewAt(y);
+                        scroll_vertical_layout2.addView( textViews2[y],y);
+
+                        scroll_ani(x,y);
+
                     }
                     else
                     {
                         scroll_set();
                     }
-
-
-
 
                 }
 
@@ -920,31 +1533,31 @@ public class Frag3 extends Fragment {
             }
         });
     }
+
+    //스크롤 애니
+    public void scroll_ani(final int x,final int y)
+    {
+        scrollView_start.post(new Runnable() {
+            @Override
+            public void run() {
+
+                scrollView_start.scrollTo(0,0);
+                scrollView_arrive.scrollTo(0,0);
+                //index가 2보다 클경우
+                ObjectAnimator.ofInt(scrollView_start, "scrollY", (x - 2) *190).setDuration(250).start();
+
+                ObjectAnimator.ofInt(scrollView_arrive, "scrollY", (y - 2) *190).setDuration(250).start();
+            }
+        });
+
+    }
+
 
     @Override
     public void onResume() {
 
         System.out.println("온리줌");
 
-
-
-        scrollView_start.post(new Runnable() {
-            @Override
-            public void run() {
-               // scrollView_start.fling(0);
-               // scrollView_start.smoothScrollTo(0,190);
-
-                scrollView_start.scrollTo(0,0);
-
-                scrollView_arrive.scrollTo(0,0);
-
-                //index가 2보다 클경우
-                ObjectAnimator.ofInt(scrollView_start, "scrollY", (10 - 2) *190).setDuration(250).start();
-
-                ObjectAnimator.ofInt(scrollView_arrive, "scrollY", (6 - 2) *190).setDuration(250).start();
-
-            }
-        });
 
         super.onResume();
 
@@ -956,9 +1569,17 @@ public class Frag3 extends Fragment {
 
         System.out.println("온퓨즈");
 
-        array_reset();
+
 
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy(){
+
+        array_reset();
+
+        super.onDestroy();
     }
 
     //현재 요일은 반환하는 함수
@@ -971,24 +1592,19 @@ public class Frag3 extends Fragment {
 
     }
 
-    //스크롤 셋
+    //스크롤 초기화
     private void scroll_set()
     {
-        textView.post(new Runnable() {
-            @Override public void run()
-            {
-                textView.scrollTo(0,0);
-                textView.scrollBy(0,0);
+
+        scrollView_start.post(new Runnable() {
+            @Override
+            public void run() {
+
+                scrollView_start.scrollTo(0,0);
+                scrollView_arrive.scrollTo(0,0);
             }
         });
 
-        textView2.post(new Runnable() {
-            @Override public void run()
-            {
-                textView2.scrollTo(0,0);
-                textView2.scrollBy(0,0);
-            }
-        });
     }
 
     //현재 요일로 버튼 셋
@@ -1035,8 +1651,8 @@ public class Frag3 extends Fragment {
 
     }
 
-    //현재 시간 아산 -> 캠
-    public void current_asan_cam()
+
+    public int current_time(ArrayList<String> arrayList)
     {
         int i = 0;
         Date startDate = null;
@@ -1053,12 +1669,12 @@ public class Frag3 extends Fragment {
 
         //--현재시간과 셔틀 시간 비교
         while (true) {
-            if (i > (asan_cam.size() -1)) {
+            if (i > (arrayList.size() -1)) {
                 i = 0;
                 break;
             }
             try {
-                endDate = dateSet.parse(asan_cam.get(i));
+                endDate = dateSet.parse(arrayList.get(i));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -1070,294 +1686,12 @@ public class Frag3 extends Fragment {
             i++;
         }
 
-        System.out.println(i);
-
-        //색칠
-        Spannable spannable = (Spannable)textView.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), (11*i)+2, (11*i)+7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //이동 하면됨
-
-        final int x = i * 300;
-
-        textView.post(new Runnable() {
-            @Override public void run()
-            {
-                textView.scrollTo(0,0);
-                textView.scrollBy(x,0);
-            }
-        });
-    }
-
-    //현재 시간 캠 -> 아산
-    public void current_cam_osan()
-    {
-        int i = 0;
-        Date startDate = null;
-        Date endDate = null;
-        SimpleDateFormat dateSet = new SimpleDateFormat("HH:mm", Locale.KOREA);
-        String time_date = dateSet.format(new Date());
-        long result = -1;
-
-        try {
-            startDate = dateSet.parse(time_date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //--현재시간과 셔틀 시간 비교
-        while (true) {
-            if (i > (cam_asan.size() -1)) {
-                i = 0;
-                break;
-            }
-            try {
-                endDate = dateSet.parse(cam_asan.get(i));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            result = endDate.getTime() - startDate.getTime();
-            if (result >= 0) {
-                break;
-            }
-
-            i++;
-        }
 
         System.out.println(i);
 
-        //색칠
-        Spannable spannable = (Spannable)textView2.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), (11*i)+2, (11*i)+7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //이동 하면됨
-
-        final int x = i * 300;
-
-        textView2.post(new Runnable() {
-            @Override public void run()
-            {
-                textView2.scrollTo(0,0);
-                textView2.scrollBy(x,0);
-            }
-        });
+        return i;
     }
 
 
-    //현재 시간 천안 -> 캠
-    public void current_Cheonan_cam()
-    {
-        int i = 0;
-        Date startDate = null;
-        Date endDate = null;
-        SimpleDateFormat dateSet = new SimpleDateFormat("HH:mm", Locale.KOREA);
-        String time_date = dateSet.format(new Date());
-        long result = -1;
-
-        try {
-            startDate = dateSet.parse(time_date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //--현재시간과 셔틀 시간 비교
-        while (true) {
-            if (i > (Cheonan_cam.size() -1)) {
-                i = 0;
-                break;
-            }
-            try {
-                endDate = dateSet.parse(Cheonan_cam.get(i));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            result = endDate.getTime() - startDate.getTime();
-            if (result >= 0) {
-                break;
-            }
-
-            i++;
-        }
-
-        System.out.println(i);
-
-        //색칠
-        Spannable spannable = (Spannable)textView.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), (11*i)+2, (11*i)+7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //이동 하면됨
-
-        final int x = i * 300;
-
-        textView.post(new Runnable() {
-            @Override public void run()
-            {
-                textView.scrollTo(0,0);
-                textView.scrollBy(x,0);
-            }
-        });
-    }
-
-    //현재 시간 캠 -> 천안
-    public void current_cam_Cheonan()
-    {
-        int i = 0;
-        Date startDate = null;
-        Date endDate = null;
-        SimpleDateFormat dateSet = new SimpleDateFormat("HH:mm", Locale.KOREA);
-        String time_date = dateSet.format(new Date());
-        long result = -1;
-
-        try {
-            startDate = dateSet.parse(time_date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //--현재시간과 셔틀 시간 비교
-        while (true) {
-            if (i > (cam_Cheonan.size() -1)) {
-                i = 0;
-                break;
-            }
-            try {
-                endDate = dateSet.parse(cam_Cheonan.get(i));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            result = endDate.getTime() - startDate.getTime();
-            if (result >= 0) {
-                break;
-            }
-
-            i++;
-        }
-
-        System.out.println(i);
-
-        //색칠
-        Spannable spannable = (Spannable)textView2.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), (11*i)+2, (11*i)+7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //이동 하면됨
-
-        final int x = i * 300;
-
-        textView2.post(new Runnable() {
-            @Override public void run()
-            {
-                textView2.scrollTo(0,0);
-                textView2.scrollBy(x,0);
-            }
-        });
-    }
-
-    //현재 시간 천안 -> 캠
-    public void current_Cheonan_terminal_cam()
-    {
-        int i = 0;
-        Date startDate = null;
-        Date endDate = null;
-        SimpleDateFormat dateSet = new SimpleDateFormat("HH:mm", Locale.KOREA);
-        String time_date = dateSet.format(new Date());
-        long result = -1;
-
-        try {
-            startDate = dateSet.parse(time_date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //--현재시간과 셔틀 시간 비교
-        while (true) {
-            if (i > (Cheonan_terminal_cam.size() -1)) {
-                i = 0;
-                break;
-            }
-            try {
-                endDate = dateSet.parse(Cheonan_terminal_cam.get(i));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            result = endDate.getTime() - startDate.getTime();
-            if (result >= 0) {
-                break;
-            }
-
-            i++;
-        }
-
-        System.out.println(i);
-
-        //색칠
-        Spannable spannable = (Spannable)textView.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), (11*i)+2, (11*i)+7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //이동 하면됨
-
-        final int x = i * 300;
-
-        textView.post(new Runnable() {
-            @Override public void run()
-            {
-                textView.scrollTo(0,0);
-                textView.scrollBy(x,0);
-            }
-        });
-    }
-
-    //현재 시간 캠 -> 천안
-    public void current_cam_Cheonan_terminal()
-    {
-        int i = 0;
-        Date startDate = null;
-        Date endDate = null;
-        SimpleDateFormat dateSet = new SimpleDateFormat("HH:mm", Locale.KOREA);
-        String time_date = dateSet.format(new Date());
-        long result = -1;
-
-        try {
-            startDate = dateSet.parse(time_date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //--현재시간과 셔틀 시간 비교
-        while (true) {
-            if (i > (cam_Cheonan_terminal.size() -1)) {
-                i = 0;
-                break;
-            }
-            try {
-                endDate = dateSet.parse(cam_Cheonan_terminal.get(i));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            result = endDate.getTime() - startDate.getTime();
-            if (result >= 0) {
-                break;
-            }
-
-            i++;
-        }
-
-        System.out.println(i);
-
-        //색칠
-        Spannable spannable = (Spannable)textView2.getText();
-        spannable.setSpan(new ForegroundColorSpan(Color.parseColor("#F85B4E")), (11*i)+2, (11*i)+7, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        //이동 하면됨
-
-        final int x = i * 300;
-
-        textView2.post(new Runnable() {
-            @Override public void run()
-            {
-                textView2.scrollTo(0,0);
-                textView2.scrollBy(x,0);
-            }
-        });
-    }
 
 }
