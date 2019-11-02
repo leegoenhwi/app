@@ -96,6 +96,8 @@ public class Frag3 extends Fragment {
 
     private JAT task;
 
+    private boolean c_check;
+
 
     @Nullable
     @Override
@@ -151,7 +153,7 @@ public class Frag3 extends Fragment {
         protected void onPreExecute() {
 
             asyncDialog.show();
-
+            c_check = false;
             super.onPreExecute();
         }
 
@@ -169,7 +171,7 @@ public class Frag3 extends Fragment {
 
             System.out.println("스레드 시작");
 
-            if(!dbhelper.table_exists()){
+            if((!dbhelper.table_exists()) &&  (!c_check)){
 
                 System.out.println("크롤링 시작");
                 dbhelper.createtable();
@@ -523,6 +525,7 @@ public class Frag3 extends Fragment {
 //            String formatDate1 = sdfNow1.format(date1);
 //            System.out.println(formatDate1);
 
+            c_check = true;
             System.out.println("쓰레드 종료");
 
 
