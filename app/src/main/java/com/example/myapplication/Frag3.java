@@ -93,6 +93,7 @@ public class Frag3 extends Fragment {
     //dbhelper클래스에 있는 메소드를 이용하여 db에 여러가지 접근이 가능하다
 
 
+
     private JAT task;
 
 
@@ -139,11 +140,10 @@ public class Frag3 extends Fragment {
 
     }
 
-    //스레드 크롤링 11초 걸림
+    //스레드 크롤링
     private class JAT extends AsyncTask<String, Void, String> {
 
-        ProgressDialog asyncDialog = new ProgressDialog(getContext());
-
+        ProgressDialog asyncDialog = new ProgressDialog(view.getContext());
 
         @Override
         protected void onPreExecute() {
@@ -169,12 +169,11 @@ public class Frag3 extends Fragment {
 
 
             System.out.println("스레드 시작");
-            if(dbhelper.table_exists())
-            {
 
-            }
-            else {
+            if(!dbhelper.table_exists()){
+
                 dbhelper.createtable();
+
                 try {
                     Document doc = Jsoup.connect(url_day_cheonan).get();
 
