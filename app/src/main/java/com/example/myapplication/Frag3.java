@@ -511,7 +511,9 @@ public class Frag3 extends Fragment {
                 }
             }
 
-            db_save_arrary_list();
+            else {
+                db_save_arrary_list();
+            }
 
 
             //측정 종료
