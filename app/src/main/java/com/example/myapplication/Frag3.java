@@ -140,13 +140,6 @@ public class Frag3 extends Fragment {
 
         current_day();
 
-//        check_butt(weekDay);
-//        singleSelectToggleGroup2.clearCheck();
-//        singleSelectToggleGroup2.check(R.id.choice_osan);
-//        db_save_arrary_list();
-//        day_select();
-//        goal_select();
-
         return view;
 
     }
@@ -184,18 +177,12 @@ public class Frag3 extends Fragment {
         protected Void doInBackground(Void... strings) {
 
 
-            //시간 측청
-//            long now = System.currentTimeMillis();
-//            Date date = new Date(now);
-//            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
-//            String formatDate = sdfNow.format(date);
-//            System.out.println(formatDate);
 
+            //시간 측정
+            time();
 
             System.out.println("스레드 시작");
-            //System.out.println(dbhelper.read_boolean());
-            //System.out.println(dbhelper.table_exists());
-            //System.out.println(dbhelper.read_boolean().equals("true") && dbhelper.table_exists());
+
 
             while (getConnectivityStatus(view.getContext()) == TYPE_NOT_CONNECTED && !dbhelper.table_exists()) {
 
@@ -563,14 +550,10 @@ public class Frag3 extends Fragment {
 
 
             //측정 종료
-//            long now1 = System.currentTimeMillis();
-//            Date date1 = new Date(now1);
-//            SimpleDateFormat sdfNow1 = new SimpleDateFormat("HH:mm:ss");
-//            String formatDate1 = sdfNow1.format(date1);
-//            System.out.println(formatDate1);
-            System.out.println(dbhelper.read_boolean());
+            time();
+//            System.out.println(dbhelper.read_boolean());
             dbhelper.true_boolean();
-            System.out.println(dbhelper.read_boolean());
+//            System.out.println(dbhelper.read_boolean());
             System.out.println("쓰레드 종료");
 
 
@@ -593,6 +576,17 @@ public class Frag3 extends Fragment {
 
         }
 
+    }
+
+    //시간 측정
+    private void time()
+    {
+        long now = System.currentTimeMillis();
+            Date date = new Date(now);
+            @SuppressLint("SimpleDateFormat")
+            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
+            String formatDate = sdfNow.format(date);
+            System.out.println(formatDate);
     }
 
 
@@ -687,6 +681,49 @@ public class Frag3 extends Fragment {
 
     }
 
+    //arrary_list text_view 생성 추가
+    public void text_view_add( ArrayList<String> array1, ArrayList<String> array2)
+    {
+        int Textview_num1 = array1.size();
+        int Textview_num2 = array2.size();
+
+        textViews1 = new TextView[Textview_num1];
+        textViews2 = new TextView[Textview_num2];
+
+        for (int i = 0; i < Textview_num1; i++) {
+            textViews1[i] = new TextView(getActivity());
+            textViews1[i].setText(array1.get(i));
+            textViews1[i].setGravity(Gravity.CENTER);
+            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
+            textViews1[i].setTextSize(25);
+            textViews1[i].setHeight(190);
+
+            scroll_vertical_layout1.addView(textViews1[i]);
+        }
+
+        for (int i = 0; i < Textview_num2; i++) {
+            textViews2[i] = new TextView(getActivity());
+            textViews2[i].setText(array2.get(i));
+            textViews2[i].setGravity(Gravity.CENTER);
+            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
+            textViews2[i].setTextSize(25);
+            textViews2[i].setHeight(190);
+
+            scroll_vertical_layout2.addView(textViews2[i]);
+        }
+    }
+
+    public void crrent_time_table(int x,int y)
+    {
+        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
+        scroll_vertical_layout1.removeViewAt(x);
+        scroll_vertical_layout1.addView(textViews1[x], x);
+
+        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
+        scroll_vertical_layout2.removeViewAt(y);
+        scroll_vertical_layout2.addView(textViews2[y], y);
+    }
+
     //목적지 선택
     public void goal_select() {
 
@@ -726,45 +763,14 @@ public class Frag3 extends Fragment {
                             empty_array2.addAll(day_asan_rev);
                         }
 
-                        int Textview_num1 = empty_array1.size();
-                        int Textview_num2 = empty_array2.size();
-
-                        textViews1 = new TextView[Textview_num1];
-                        textViews2 = new TextView[Textview_num2];
-
-                        for (int i = 0; i < Textview_num1; i++) {
-                            textViews1[i] = new TextView(getActivity());
-                            textViews1[i].setText(empty_array1.get(i));
-                            textViews1[i].setGravity(Gravity.CENTER);
-                            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                            textViews1[i].setTextSize(25);
-                            textViews1[i].setHeight(190);
-
-                            scroll_vertical_layout1.addView(textViews1[i]);
-                        }
-
-                        for (int i = 0; i < Textview_num2; i++) {
-                            textViews2[i] = new TextView(getActivity());
-                            textViews2[i].setText(empty_array2.get(i));
-                            textViews2[i].setGravity(Gravity.CENTER);
-                            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                            textViews2[i].setTextSize(25);
-                            textViews2[i].setHeight(190);
-
-                            scroll_vertical_layout2.addView(textViews2[i]);
-                        }
+                        text_view_add(empty_array1,empty_array2);
 
 
                         if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
-                            textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                            scroll_vertical_layout1.removeViewAt(x);
-                            scroll_vertical_layout1.addView(textViews1[x], x);
-
                             int y = current_time(empty_array2);
-                            textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                            scroll_vertical_layout2.removeViewAt(y);
-                            scroll_vertical_layout2.addView(textViews2[y], y);
+
+                            crrent_time_table(x,y);
 
                             scroll_ani(x, y);
                         } else {
@@ -787,43 +793,13 @@ public class Frag3 extends Fragment {
                             empty_array2.addAll(day_cheonan_rev);
                         }
 
-                        int Textview_num3 = empty_array1.size();
-                        int Textview_num4 = empty_array2.size();
+                        text_view_add(empty_array1,empty_array2);
 
-                        textViews1 = new TextView[Textview_num3];
-                        textViews2 = new TextView[Textview_num4];
-
-                        for (int i = 0; i < Textview_num3; i++) {
-                            textViews1[i] = new TextView(getActivity());
-                            textViews1[i].setText(empty_array1.get(i));
-                            textViews1[i].setGravity(Gravity.CENTER);
-                            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                            textViews1[i].setTextSize(25);
-                            textViews1[i].setHeight(190);
-
-                            scroll_vertical_layout1.addView(textViews1[i]);
-                        }
-
-                        for (int i = 0; i < Textview_num4; i++) {
-                            textViews2[i] = new TextView(getActivity());
-                            textViews2[i].setText(empty_array2.get(i));
-                            textViews2[i].setGravity(Gravity.CENTER);
-                            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                            textViews2[i].setTextSize(25);
-                            textViews2[i].setHeight(190);
-
-                            scroll_vertical_layout2.addView(textViews2[i]);
-                        }
                         if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
-                            textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                            scroll_vertical_layout1.removeViewAt(x);
-                            scroll_vertical_layout1.addView(textViews1[x], x);
-
                             int y = current_time(empty_array2);
-                            textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                            scroll_vertical_layout2.removeViewAt(y);
-                            scroll_vertical_layout2.addView(textViews2[y], y);
+
+                            crrent_time_table(x,y);
 
                             scroll_ani(x, y);
                         } else {
@@ -846,45 +822,14 @@ public class Frag3 extends Fragment {
                             empty_array2.addAll(day_terminal_rev);
                         }
 
-                        int Textview_num5 = empty_array1.size();
-                        int Textview_num6 = empty_array2.size();
-
-                        textViews1 = new TextView[Textview_num5];
-                        textViews2 = new TextView[Textview_num6];
-
-                        for (int i = 0; i < Textview_num5; i++) {
-                            textViews1[i] = new TextView(getActivity());
-                            textViews1[i].setText(empty_array1.get(i));
-                            textViews1[i].setGravity(Gravity.CENTER);
-                            textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                            textViews1[i].setTextSize(25);
-                            textViews1[i].setHeight(190);
-
-                            scroll_vertical_layout1.addView(textViews1[i]);
-                        }
-
-                        for (int i = 0; i < Textview_num6; i++) {
-                            textViews2[i] = new TextView(getActivity());
-                            textViews2[i].setText(empty_array2.get(i));
-                            textViews2[i].setGravity(Gravity.CENTER);
-                            textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                            textViews2[i].setTextSize(25);
-                            textViews2[i].setHeight(190);
-
-                            scroll_vertical_layout2.addView(textViews2[i]);
-                        }
+                        text_view_add(empty_array1,empty_array2);
 
 
                         if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
-                            textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                            scroll_vertical_layout1.removeViewAt(x);
-                            scroll_vertical_layout1.addView(textViews1[x], x);
-
                             int y = current_time(empty_array2);
-                            textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                            scroll_vertical_layout2.removeViewAt(y);
-                            scroll_vertical_layout2.addView(textViews2[y], y);
+
+                            crrent_time_table(x,y);
 
                             scroll_ani(x, y);
                         } else {
@@ -961,44 +906,14 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    int Textview_num3 = empty_array3.size();
-                    int Textview_num4 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num3];
-                    textViews2 = new TextView[Textview_num4];
-
-                    for (int i = 0; i < Textview_num3; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num4; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_a == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
 
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1022,44 +937,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    int Textview_num1 = empty_array3.size();
-                    int Textview_num2 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num1];
-                    textViews2 = new TextView[Textview_num2];
-
-                    for (int i = 0; i < Textview_num1; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num2; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_b == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
-
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1083,44 +967,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    int Textview_num1 = empty_array3.size();
-                    int Textview_num2 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num1];
-                    textViews2 = new TextView[Textview_num2];
-
-                    for (int i = 0; i < Textview_num1; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num2; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_c == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
-
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1143,44 +996,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    int Textview_num1 = empty_array3.size();
-                    int Textview_num2 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num1];
-                    textViews2 = new TextView[Textview_num2];
-
-                    for (int i = 0; i < Textview_num1; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num2; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_d == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
-
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1203,44 +1025,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(fri_terminal_rev);
                     }
 
-                    int Textview_num1 = empty_array3.size();
-                    int Textview_num2 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num1];
-                    textViews2 = new TextView[Textview_num2];
-
-                    for (int i = 0; i < Textview_num1; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num2; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_e == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
-
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1264,44 +1055,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(sat_terminal_rev);
                     }
 
-                    int Textview_num1 = empty_array3.size();
-                    int Textview_num2 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num1];
-                    textViews2 = new TextView[Textview_num2];
-
-                    for (int i = 0; i < Textview_num1; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num2; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_f == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
-
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1324,45 +1084,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(sun_terminal_rev);
                     }
 
-                    int Textview_num1 = empty_array3.size();
-                    int Textview_num2 = empty_array4.size();
-
-                    textViews1 = new TextView[Textview_num1];
-                    textViews2 = new TextView[Textview_num2];
-
-
-                    for (int i = 0; i < Textview_num1; i++) {
-                        textViews1[i] = new TextView(getActivity());
-                        textViews1[i].setText(empty_array3.get(i));
-                        textViews1[i].setGravity(Gravity.CENTER);
-                        textViews1[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews1[i].setTextSize(25);
-                        textViews1[i].setHeight(190);
-
-                        scroll_vertical_layout1.addView(textViews1[i]);
-                    }
-
-                    for (int i = 0; i < Textview_num2; i++) {
-                        textViews2[i] = new TextView(getActivity());
-                        textViews2[i].setText(empty_array4.get(i));
-                        textViews2[i].setGravity(Gravity.CENTER);
-                        textViews2[i].setTextColor(Color.rgb(169, 169, 169));
-                        textViews2[i].setTextSize(25);
-                        textViews2[i].setHeight(190);
-
-                        scroll_vertical_layout2.addView(textViews2[i]);
-                    }
+                    text_view_add(empty_array3,empty_array4);
 
                     if (R.id.choice_g == curr_Day) {
                         int x = current_time(empty_array3);
-                        textViews1[x].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout1.removeViewAt(x);
-                        scroll_vertical_layout1.addView(textViews1[x], x);
-
                         int y = current_time(empty_array4);
-                        textViews2[y].setTextColor(Color.rgb(248, 91, 78));
-                        scroll_vertical_layout2.removeViewAt(y);
-                        scroll_vertical_layout2.addView(textViews2[y], y);
+
+                        crrent_time_table(x,y);
 
                         scroll_ani(x, y);
 
@@ -1377,7 +1105,7 @@ public class Frag3 extends Fragment {
         });
     }
 
-    //스크롤 애니
+    //스크롤 애니메이션
     public void scroll_ani(final int x, final int y) {
         scrollView_start.post(new Runnable() {
             @Override
@@ -1477,6 +1205,7 @@ public class Frag3 extends Fragment {
     }
 
 
+    //현재시간 받아와서 array_list 배열 비교 알고리즘
     public int current_time(ArrayList<String> arrayList) {
         int i = 0;
         Date startDate = null;
