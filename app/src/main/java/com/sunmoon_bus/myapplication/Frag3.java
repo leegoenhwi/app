@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.sunmoon_bus.myapplication;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -55,6 +55,8 @@ public class Frag3 extends Fragment {
 
     private TextView[] textViews1;
     private TextView[] textViews2;
+
+    private TextView right_textview;
 
     int curr_Day;
 
@@ -122,6 +124,8 @@ public class Frag3 extends Fragment {
 
         scrollView_start = (NestedScrollView) view.findViewById(R.id.school_start);
         scrollView_arrive = (NestedScrollView) view.findViewById(R.id.school_arrive);
+
+        right_textview = (TextView) view.findViewById(R.id.right_textview);
 
         refresh_Layout3 = (SwipeRefreshLayout) view.findViewById(R.id.refresh_Layout3);
 
@@ -833,6 +837,8 @@ public class Frag3 extends Fragment {
                 switch (checkedId) {
                     case R.id.choice_osan:
 
+                        right_textview.setText("아산역 출발");
+
                         if (singleSelectToggleGroup.getCheckedId() == R.id.choice_e) {
                             empty_array1.addAll(fri_asan);
                             empty_array2.addAll(fri_asan_rev);
@@ -863,6 +869,8 @@ public class Frag3 extends Fragment {
                         break;
                     case R.id.choice_Cheonan:
 
+                        right_textview.setText("천안역 출발");
+
                         if (singleSelectToggleGroup.getCheckedId() == R.id.choice_e) {
                             empty_array1.addAll(fri_cheonan);
                             empty_array2.addAll(fri_cheonan_rev);
@@ -891,6 +899,8 @@ public class Frag3 extends Fragment {
                         }
                         break;
                     case R.id.choice_Cheonan_terminal:
+
+                        right_textview.setText("천안터미널 출발");
 
                         if (singleSelectToggleGroup.getCheckedId() == R.id.choice_e) {
                             empty_array1.addAll(fri_terminal);

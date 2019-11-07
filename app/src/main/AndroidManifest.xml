@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
-    package="com.example.myapplication"
+    package="com.sunmoon_bus.myapplication"
     android:versionCode="1"
     android:versionName="1.0.0">
 
@@ -33,14 +33,14 @@
 <!--이건휘-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDCqSPGJKxubFaUMywmhQUx-w2ThO-E2Gs"/>
+            android:value="AIzaSyAS9SWs0ooFQ06Gfp0yO1zstnd5chu0mHk"/>
         <!--광고-->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-5331304879189183~1559540203"/>
 
         <activity
-            android:name=".SplashActivity"
+            android:name="com.sunmoon_bus.myapplication.SplashActivity"
             android:theme="@style/SplashTheme"
             android:supportsPictureInPicture="false"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">
@@ -52,7 +52,7 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.sunmoon_bus.myapplication.MainActivity"
             android:theme="@style/AppTheme"
             android:supportsPictureInPicture="false"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">

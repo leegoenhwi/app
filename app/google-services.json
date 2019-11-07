@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:693880911919:android:8dbba1e13297c42b9caeda",
         "android_client_info": {
-          "package_name": "com.example.myapplication"
+          "package_name": "com.sunmoon_bus.myapplication"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "693880911919-jabd90vbe9qg57ueak29t9dng210jqmi.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.myapplication",
+            "package_name": "com.sunmoon_bus.myapplication",
             "certificate_hash": "bf769a4abf2ae87f3bb6913404afd4f4147facb0"
           }
         },

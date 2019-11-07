@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.sunmoon_bus.myapplication;
 
 import android.app.Dialog;
 import android.content.Context;
