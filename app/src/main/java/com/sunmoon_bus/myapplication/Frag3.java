@@ -84,6 +84,7 @@ public class Frag3 extends Fragment {
     private ArrayList<String> sun_cheonan_rev = new ArrayList<String>();
     private ArrayList<String> sun_asan_rev = new ArrayList<String>();
     private ArrayList<String> sun_terminal_rev = new ArrayList<String>();
+
     //쓰는 Arraylist들
 
     private String url_day_cheonan = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_01_01_01.aspx";
@@ -93,6 +94,10 @@ public class Frag3 extends Fragment {
     private String url_sat_terminal = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_02_02.aspx";
     private String url_sun_cheonan_asan = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_03_01.aspx";
     private String url_sun_terminal = "https://lily.sunmoon.ac.kr/Page/About/About08_04_02_03_02.aspx";
+    private String url_day_cheonan_asan_holi = "https://lily.sunmoon.ac.kr/Page/About/About08_04_03_01_01.aspx";
+    private String url_day_terminal_holi = "https://lily.sunmoon.ac.kr/Page/About/About08_04_03_01_02.aspx";
+    private String url_weekend_cheonan_asan_holi = "https://lily.sunmoon.ac.kr/Page/About/About08_04_03_02_01.aspx";
+    private String url_weekend_terminal_holi = "https://lily.sunmoon.ac.kr/Page/About/About08_04_03_02_02.aspx";
     //크롤링에 필요한 url들
 
     private DBHelper dbhelper;
@@ -108,13 +113,54 @@ public class Frag3 extends Fragment {
 
     private int i_error = 0;
 
+    private String get_today() {
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy/MM/dd");
+
+        String format_time1 = format1.format(System.currentTimeMillis());
+
+        return format_time1;
+    }
+
+    private int compare_day(String start_day, String end_day, String to_day) {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        try {
+            Date start = format.parse(start_day);
+            Date end = format.parse(end_day);
+            Date day = format.parse(to_day);
+
+            //방학 아님
+            if ((day.getTime() - start.getTime()) < 0) {
+                System.out.println("방학아님");
+                return 0;
+            }
+
+            if ((day.getTime() - end.getTime()) > 0) {
+                System.out.println("방학아님");
+                return 0;
+            }
+
+            //방학
+            if (((day.getTime() - start.getTime()) >= 0) && ((day.getTime() - end.getTime()) <= 0)) {
+                System.out.println("방학임");
+                return 1;
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            System.out.println("-1");
+            return -1;
+        }
+        System.out.println("-1");
+        return -1;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
 
-        dbhelper = new DBHelper(getContext(), "db.db", null, 1);
+        dbhelper = new DBHelper(getContext(), "db.db", null, 3);
 
         view = inflater.inflate(R.layout.fragment3, container, false);
 
@@ -151,15 +197,15 @@ public class Frag3 extends Fragment {
     }
 
     //인터넷 연결상태 확인
-    private static int getConnectivityStatus(Context context){ //해당 context의 서비스를 사용하기위해서 context객체를 받는다.
+    private static int getConnectivityStatus(Context context) { //해당 context의 서비스를 사용하기위해서 context객체를 받는다.
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-        if(networkInfo != null){
+        if (networkInfo != null) {
             int type = networkInfo.getType();
-            if(type == ConnectivityManager.TYPE_MOBILE){//쓰리지나 LTE로 연결된것(모바일을 뜻한다.)
+            if (type == ConnectivityManager.TYPE_MOBILE) {//쓰리지나 LTE로 연결된것(모바일을 뜻한다.)
                 return TYPE_MOBILE;
-            }else if(type == ConnectivityManager.TYPE_WIFI){//와이파이 연결된것
+            } else if (type == ConnectivityManager.TYPE_WIFI) {//와이파이 연결된것
                 return TYPE_WIFI;
             }
         }
@@ -167,8 +213,7 @@ public class Frag3 extends Fragment {
     }
 
     //연결 루프
-    private void connect_internet()
-    {
+    private void connect_internet() {
         while (getConnectivityStatus(view.getContext()) == TYPE_NOT_CONNECTED) {
 
 
@@ -179,14 +224,13 @@ public class Frag3 extends Fragment {
 
                 Thread.sleep(3000);
 
-            } catch(InterruptedException ex) {
+            } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
 
 
         }
     }
-
 
 
     //스레드 크롤링
@@ -206,85 +250,22 @@ public class Frag3 extends Fragment {
         @Override
         protected Void doInBackground(Void... strings) {
 
-
-
+            System.out.println("스레드 시작");
             //시간 측정
             time();
+            String holiday = null;
+            String today = get_today();
 
-            System.out.println("스레드 시작");
-
-            if (dbhelper.read_boolean().equals("true") && dbhelper.table_exists()) {
-                db_save_arrary_list();
-            }
-            else {
-                System.out.println("크롤링 시작");
+            if (dbhelper.read_boolean().equals("false")) {
                 if (dbhelper.table_exists()) {
                     dbhelper.droptable();
                 }
                 dbhelper.createtable();
-
                 while (true) {
-
                     try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_day_cheonan).get();
-
-                        Elements table = doc.select("div.table01 td:eq(2)");
-                        Elements table3 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                day_cheonan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 0; i < day_cheonan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.insert(day_cheonan_rev.get(i));
-                        }
-                        dbhelper.insert("end");
-                        System.out.println(day_cheonan_rev.size());
-                        System.out.println("평일 천안 역");
-
-                        for (Element e : table) {
-                            if (!e.text().contains("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                fri_cheonan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= fri_cheonan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(fri_cheonan_rev.get(i - 1), i, "cheonan_fri_rev");
-                        }
-                        System.out.println(fri_cheonan_rev.size());
-                        System.out.println("금 천안 역");
-
-                        for (Element e : table3) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                day_cheonan.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= day_cheonan.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(day_cheonan.get(i - 1), i, "cheonan_day");
-                        }
-                        System.out.println(day_cheonan.size());
-                        System.out.println("평일 천안");
-
-                        for (Element e : table3) {
-                            if (!e.text().contains("X")) {
-                                fri_cheonan.add(e.text());
-                            }
-                        }
-                        for (int i = 1; i <= fri_cheonan.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(fri_cheonan.get(i - 1), i, "cheonan_fri");
-                        }
-                        System.out.println(fri_cheonan.size());
-                        System.out.println("금 천안");
-
+                        Document doc = Jsoup.connect(url_day_cheonan_asan_holi).get();
+                        Elements table = doc.select("div.contents h3:eq(2)");
+                        holiday = table.text();
                         break;
                     } catch (IOException e) {
                         System.out.println("캐치");
@@ -294,342 +275,1678 @@ public class Frag3 extends Fragment {
                         e.printStackTrace();
                     }
                 }
+                dbhelper.update_holi(holiday);
+                dbhelper.update_holi_date(today);
+                if (compare_day(dbhelper.holi_read("start"), dbhelper.holi_read("end"), today) == 1) {
+                    System.out.println("방학 크롤링 시작");
+                    if (dbhelper.table_exists()) {
+                        dbhelper.droptable();
+                    }
+                    dbhelper.createtable();
 
-                while (true) {
+                    while (true) {
 
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_day_cheonan_asan_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(3)");
+                            Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 0; i < day_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.insert(day_cheonan_rev.get(i));
+                            }
+                            dbhelper.insert("end");
+                            System.out.println(day_cheonan_rev.size());
+                            System.out.println("평일 천안 역");
+
+                            for (Element e : table) {
+                                if (!e.text().contains("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    fri_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= fri_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_cheonan_rev.get(i - 1), i, "cheonan_fri_rev");
+                            }
+                            System.out.println(fri_cheonan_rev.size());
+                            System.out.println("금 천안 역");
+
+                            for (Element e : table3) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_cheonan.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_cheonan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_cheonan.get(i - 1), i, "cheonan_day");
+                            }
+                            System.out.println(day_cheonan.size());
+                            System.out.println("평일 천안");
+
+                            for (Element e : table3) {
+                                if (!e.text().contains("X")) {
+                                    fri_cheonan.add(e.text());
+                                }
+                            }
+                            for (int i = 1; i <= fri_cheonan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_cheonan.get(i - 1), i, "cheonan_fri");
+                            }
+                            System.out.println(fri_cheonan.size());
+                            System.out.println("금 천안");
+
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_day_terminal_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_terminal_rev.get(i - 1), i, "terminal_day_rev");
+                            }
+                            System.out.println(day_terminal_rev.size());
+                            System.out.println("평일 터미널 역");
+
+                            for (Element e : table) {
+                                if (!e.text().contains("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    fri_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= fri_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_terminal_rev.get(i - 1), i, "terminal_fri_rev");
+                            }
+                            System.out.println(fri_terminal_rev.size());
+                            System.out.println("금 터미널 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_terminal.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_terminal.get(i - 1), i, "terminal_day");
+                            }
+                            System.out.println(day_terminal.size());
+                            System.out.println("평일 터미널");
+                            for (Element e : table2) {
+                                if (!e.text().contains("X")) {
+                                    fri_terminal.add(e.text());
+                                }
+                            }
+                            for (int i = 1; i <= fri_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_terminal.get(i - 1), i, "terminal_fri");
+                            }
+                            System.out.println(fri_terminal.size());
+                            System.out.println("금 터미널");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_day_cheonan_asan_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(4)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_asan_rev.get(i - 1), i, "asan_day_rev");
+                            }
+                            System.out.println(day_asan_rev.size());
+                            System.out.println("평일 아산 역");
+
+                            for (Element e : table) {
+                                if (!e.text().contains("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    fri_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_asan_rev.get(i - 1), i, "asan_fri_rev");
+                            }
+                            System.out.println(fri_asan_rev.size());
+                            System.out.println("금 아산 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_asan.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_asan.get(i - 1), i, "asan_day");
+                            }
+                            System.out.println(day_asan.size());
+                            System.out.println("평일 아산");
+
+                            for (Element e : table2) {
+                                if (!e.text().contains("X")) {
+                                    fri_asan.add(e.text());
+                                }
+                            }
+                            for (int i = 1; i <= fri_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_asan.get(i - 1), i, "asan_fri");
+                            }
+                            System.out.println(fri_asan.size());
+                            System.out.println("금 아산");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_weekend_cheonan_asan_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(3)");
+                            Elements table2 = doc.select("div.table01 td:eq(4)");
+                            Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sat_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_cheonan_rev.get(i - 1), i, "cheonan_sat_rev");
+                            }
+                            System.out.println(sat_cheonan_rev.size());
+                            System.out.println("토 천안 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sat_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sat_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_asan_rev.get(i - 1), i, "asan_sat_rev");
+                            }
+                            System.out.println(sat_asan_rev.size());
+                            System.out.println("토 아산 역");
+
+                            for (Element e : table3) {
+                                sat_cheonan_asan.add(e.text());
+                            }
+                            for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_cheonan_asan.get(i - 1), i, "cheonan_asan_sat");
+                            }
+                            System.out.println(sat_cheonan_asan.size());
+                            System.out.println("토 천안아산");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_weekend_terminal_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sat_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sat_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_terminal_rev.get(i - 1), i, "terminal_sat_rev");
+                            }
+                            System.out.println(sat_terminal_rev.size());
+                            System.out.println("토 터미널 역");
+
+                            for (Element e : table2) {
+                                sat_terminal.add(e.text());
+                            }
+                            for (int i = 1; i <= sat_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_terminal.get(i - 1), i, "terminal_sat");
+                            }
+                            System.out.println(sat_terminal.size());
+                            System.out.println("토 터미널");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_weekend_cheonan_asan_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(3)");
+                            Elements table2 = doc.select("div.table01 td:eq(4)");
+                            Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sun_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_cheonan_rev.get(i - 1), i, "cheonan_sun_rev");
+                            }
+                            System.out.println(sun_cheonan_rev.size());
+                            System.out.println("일 천안 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sun_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sun_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_asan_rev.get(i - 1), i, "asan_sun_rev");
+                            }
+                            System.out.println(sun_asan_rev.size());
+                            System.out.println("일 아산 역");
+
+                            for (Element e : table3) {
+                                sun_cheonan_asan.add(e.text());
+                            }
+                            for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_cheonan_asan.get(i - 1), i, "cheonan_asan_sun");
+                            }
+                            System.out.println(sun_cheonan_asan.size());
+                            System.out.println("일 천안아산");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_weekend_terminal_holi).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sun_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sun_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_terminal_rev.get(i - 1), i, "terminal_sun_rev");
+                            }
+                            System.out.println(sun_terminal_rev.size());
+                            System.out.println("일 터미널 역");
+
+                            for (Element e : table2) {
+                                sun_terminal.add(e.text());
+                            }
+                            for (int i = 1; i <= sun_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_terminal.get(i - 1), i, "terminal_sun");
+                            }
+                            System.out.println(sun_terminal.size());
+                            System.out.println("일 터미널");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+                    dbhelper.rev_boolean();
+                    dbhelper.update_holi_compare(1);
+                } else {
+                    System.out.println("학기 크롤링 시작");
+                    if (dbhelper.table_exists()) {
+                        dbhelper.droptable();
+                    }
+                    dbhelper.createtable();
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_day_cheonan).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 0; i < day_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.insert(day_cheonan_rev.get(i));
+                            }
+                            dbhelper.insert("end");
+                            System.out.println(day_cheonan_rev.size());
+                            System.out.println("평일 천안 역");
+
+                            for (Element e : table) {
+                                if (!e.text().contains("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    fri_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= fri_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_cheonan_rev.get(i - 1), i, "cheonan_fri_rev");
+                            }
+                            System.out.println(fri_cheonan_rev.size());
+                            System.out.println("금 천안 역");
+
+                            for (Element e : table3) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_cheonan.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_cheonan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_cheonan.get(i - 1), i, "cheonan_day");
+                            }
+                            System.out.println(day_cheonan.size());
+                            System.out.println("평일 천안");
+
+                            for (Element e : table3) {
+                                if (!e.text().contains("X")) {
+                                    fri_cheonan.add(e.text());
+                                }
+                            }
+                            for (int i = 1; i <= fri_cheonan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_cheonan.get(i - 1), i, "cheonan_fri");
+                            }
+                            System.out.println(fri_cheonan.size());
+                            System.out.println("금 천안");
+
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_day_terminal).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_terminal_rev.get(i - 1), i, "terminal_day_rev");
+                            }
+                            System.out.println(day_terminal_rev.size());
+                            System.out.println("평일 터미널 역");
+
+                            for (Element e : table) {
+                                if (!e.text().contains("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    fri_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= fri_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_terminal_rev.get(i - 1), i, "terminal_fri_rev");
+                            }
+                            System.out.println(fri_terminal_rev.size());
+                            System.out.println("금 터미널 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_terminal.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_terminal.get(i - 1), i, "terminal_day");
+                            }
+                            System.out.println(day_terminal.size());
+                            System.out.println("평일 터미널");
+                            for (Element e : table2) {
+                                if (!e.text().contains("X")) {
+                                    fri_terminal.add(e.text());
+                                }
+                            }
+                            for (int i = 1; i <= fri_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_terminal.get(i - 1), i, "terminal_fri");
+                            }
+                            System.out.println(fri_terminal.size());
+                            System.out.println("금 터미널");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_day_asan).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_asan_rev.get(i - 1), i, "asan_day_rev");
+                            }
+                            System.out.println(day_asan_rev.size());
+                            System.out.println("평일 아산 역");
+
+                            for (Element e : table) {
+                                if (!e.text().contains("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    fri_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_asan_rev.get(i - 1), i, "asan_fri_rev");
+                            }
+                            System.out.println(fri_asan_rev.size());
+                            System.out.println("금 아산 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    day_asan.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= day_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(day_asan.get(i - 1), i, "asan_day");
+                            }
+                            System.out.println(day_asan.size());
+                            System.out.println("평일 아산");
+
+                            for (Element e : table2) {
+                                if (!e.text().contains("X")) {
+                                    fri_asan.add(e.text());
+                                }
+                            }
+                            for (int i = 1; i <= fri_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(fri_asan.get(i - 1), i, "asan_fri");
+                            }
+                            System.out.println(fri_asan.size());
+                            System.out.println("금 아산");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
+
+                            Elements table = doc.select("div.table01 td:eq(3)");
+                            Elements table2 = doc.select("div.table01 td:eq(4)");
+                            Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sat_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_cheonan_rev.get(i - 1), i, "cheonan_sat_rev");
+                            }
+                            System.out.println(sat_cheonan_rev.size());
+                            System.out.println("토 천안 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sat_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sat_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_asan_rev.get(i - 1), i, "asan_sat_rev");
+                            }
+                            System.out.println(sat_asan_rev.size());
+                            System.out.println("토 아산 역");
+
+                            for (Element e : table3) {
+                                sat_cheonan_asan.add(e.text());
+                            }
+                            for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_cheonan_asan.get(i - 1), i, "cheonan_asan_sat");
+                            }
+                            System.out.println(sat_cheonan_asan.size());
+                            System.out.println("토 천안아산");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_sat_terminal).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sat_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sat_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_terminal_rev.get(i - 1), i, "terminal_sat_rev");
+                            }
+                            System.out.println(sat_terminal_rev.size());
+                            System.out.println("토 터미널 역");
+
+                            for (Element e : table2) {
+                                sat_terminal.add(e.text());
+                            }
+                            for (int i = 1; i <= sat_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sat_terminal.get(i - 1), i, "terminal_sat");
+                            }
+                            System.out.println(sat_terminal.size());
+                            System.out.println("토 터미널");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
+
+                            Elements table = doc.select("div.table01 td:eq(3)");
+                            Elements table2 = doc.select("div.table01 td:eq(4)");
+                            Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sun_cheonan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_cheonan_rev.get(i - 1), i, "cheonan_sun_rev");
+                            }
+                            System.out.println(sun_cheonan_rev.size());
+                            System.out.println("일 천안 역");
+
+                            for (Element e : table2) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sun_asan_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sun_asan_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_asan_rev.get(i - 1), i, "asan_sun_rev");
+                            }
+                            System.out.println(sun_asan_rev.size());
+                            System.out.println("일 아산 역");
+
+                            for (Element e : table3) {
+                                sun_cheonan_asan.add(e.text());
+                            }
+                            for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_cheonan_asan.get(i - 1), i, "cheonan_asan_sun");
+                            }
+                            System.out.println(sun_cheonan_asan.size());
+                            System.out.println("일 천안아산");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+
+                    while (true) {
+                        try {
+                            i_error = 0;
+                            publishProgress();
+                            Document doc = Jsoup.connect(url_sun_terminal).get();
+
+                            Elements table = doc.select("div.table01 td:eq(2)");
+                            Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                            for (Element e : table) {
+                                if (!e.text().equals("X")) {
+                                    String n[] = (e.text()).split("\\(");
+                                    sun_terminal_rev.add(n[0]);
+                                }
+                            }
+                            for (int i = 1; i <= sun_terminal_rev.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_terminal_rev.get(i - 1), i, "terminal_sun_rev");
+                            }
+                            System.out.println(sun_terminal_rev.size());
+                            System.out.println("일 터미널 역");
+
+                            for (Element e : table2) {
+                                sun_terminal.add(e.text());
+                            }
+                            for (int i = 1; i <= sun_terminal.size(); i++) {
+                                System.out.println("포문");
+                                dbhelper.update(sun_terminal.get(i - 1), i, "terminal_sun");
+                            }
+                            System.out.println(sun_terminal.size());
+                            System.out.println("일 터미널");
+                            break;
+                        } catch (IOException e) {
+                            System.out.println("캐치");
+                            i_error = 1;
+                            publishProgress();
+                            connect_internet();
+                            e.printStackTrace();
+                        }
+                    }
+                    dbhelper.rev_boolean();
+                    dbhelper.update_holi_compare(0);
+                }
+            } else {
+                if (dbhelper.holi_date_read().equals(today)) {
+                    db_save_arrary_list();
+                } else {
                     try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_day_terminal).get();
-
-                        Elements table = doc.select("div.table01 td:eq(2)");
-                        Elements table2 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                day_terminal_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= day_terminal_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(day_terminal_rev.get(i - 1), i, "terminal_day_rev");
-                        }
-                        System.out.println(day_terminal_rev.size());
-                        System.out.println("평일 터미널 역");
-
-                        for (Element e : table) {
-                            if (!e.text().contains("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                fri_terminal_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= fri_terminal_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(fri_terminal_rev.get(i - 1), i, "terminal_fri_rev");
-                        }
-                        System.out.println(fri_terminal_rev.size());
-                        System.out.println("금 터미널 역");
-
-                        for (Element e : table2) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                day_terminal.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= day_terminal.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(day_terminal.get(i - 1), i, "terminal_day");
-                        }
-                        System.out.println(day_terminal.size());
-                        System.out.println("평일 터미널");
-                        for (Element e : table2) {
-                            if (!e.text().contains("X")) {
-                                fri_terminal.add(e.text());
-                            }
-                        }
-                        for (int i = 1; i <= fri_terminal.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(fri_terminal.get(i - 1), i, "terminal_fri");
-                        }
-                        System.out.println(fri_terminal.size());
-                        System.out.println("금 터미널");
-                        break;
+                        Document doc = Jsoup.connect(url_day_cheonan_asan_holi).get();
+                        Elements table = doc.select("div.contents h3:eq(2)");
+                        holiday = table.text();
                     } catch (IOException e) {
-                        System.out.println("캐치");
-                        i_error = 1;
-                        publishProgress();
-                        connect_internet();
                         e.printStackTrace();
                     }
-                }
-
-                while (true) {
-                    try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_day_asan).get();
-
-                        Elements table = doc.select("div.table01 td:eq(2)");
-                        Elements table2 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                day_asan_rev.add(n[0]);
+                    dbhelper.update_holi(holiday);
+                    dbhelper.update_holi_date(today);
+                    if (compare_day(dbhelper.holi_read("start"), dbhelper.holi_read("end"), today) == dbhelper.holi_compare_read()) {
+                        db_save_arrary_list();
+                    } else {
+                        dbhelper.rev_boolean();
+                        if (compare_day(dbhelper.holi_read("start"), dbhelper.holi_read("end"), today) == 1) {
+                            System.out.println("방학 크롤링 시작");
+                            if (dbhelper.table_exists()) {
+                                dbhelper.droptable();
                             }
-                        }
-                        for (int i = 1; i <= day_asan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(day_asan_rev.get(i - 1), i, "asan_day_rev");
-                        }
-                        System.out.println(day_asan_rev.size());
-                        System.out.println("평일 아산 역");
+                            dbhelper.createtable();
 
-                        for (Element e : table) {
-                            if (!e.text().contains("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                fri_asan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= fri_asan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(fri_asan_rev.get(i - 1), i, "asan_fri_rev");
-                        }
-                        System.out.println(fri_asan_rev.size());
-                        System.out.println("금 아산 역");
+                            while (true) {
 
-                        for (Element e : table2) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                day_asan.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= day_asan.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(day_asan.get(i - 1), i, "asan_day");
-                        }
-                        System.out.println(day_asan.size());
-                        System.out.println("평일 아산");
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_day_cheonan_asan_holi).get();
 
-                        for (Element e : table2) {
-                            if (!e.text().contains("X")) {
-                                fri_asan.add(e.text());
+                                    Elements table = doc.select("div.table01 td:eq(3)");
+                                    Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 0; i < day_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.insert(day_cheonan_rev.get(i));
+                                    }
+                                    dbhelper.insert("end");
+                                    System.out.println(day_cheonan_rev.size());
+                                    System.out.println("평일 천안 역");
+
+                                    for (Element e : table) {
+                                        if (!e.text().contains("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            fri_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_cheonan_rev.get(i - 1), i, "cheonan_fri_rev");
+                                    }
+                                    System.out.println(fri_cheonan_rev.size());
+                                    System.out.println("금 천안 역");
+
+                                    for (Element e : table3) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_cheonan.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_cheonan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_cheonan.get(i - 1), i, "cheonan_day");
+                                    }
+                                    System.out.println(day_cheonan.size());
+                                    System.out.println("평일 천안");
+
+                                    for (Element e : table3) {
+                                        if (!e.text().contains("X")) {
+                                            fri_cheonan.add(e.text());
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_cheonan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_cheonan.get(i - 1), i, "cheonan_fri");
+                                    }
+                                    System.out.println(fri_cheonan.size());
+                                    System.out.println("금 천안");
+
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
                             }
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_day_terminal_holi).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_terminal_rev.get(i - 1), i, "terminal_day_rev");
+                                    }
+                                    System.out.println(day_terminal_rev.size());
+                                    System.out.println("평일 터미널 역");
+
+                                    for (Element e : table) {
+                                        if (!e.text().contains("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            fri_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_terminal_rev.get(i - 1), i, "terminal_fri_rev");
+                                    }
+                                    System.out.println(fri_terminal_rev.size());
+                                    System.out.println("금 터미널 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_terminal.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_terminal.get(i - 1), i, "terminal_day");
+                                    }
+                                    System.out.println(day_terminal.size());
+                                    System.out.println("평일 터미널");
+                                    for (Element e : table2) {
+                                        if (!e.text().contains("X")) {
+                                            fri_terminal.add(e.text());
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_terminal.get(i - 1), i, "terminal_fri");
+                                    }
+                                    System.out.println(fri_terminal.size());
+                                    System.out.println("금 터미널");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_day_cheonan_asan_holi).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(4)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_asan_rev.get(i - 1), i, "asan_day_rev");
+                                    }
+                                    System.out.println(day_asan_rev.size());
+                                    System.out.println("평일 아산 역");
+
+                                    for (Element e : table) {
+                                        if (!e.text().contains("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            fri_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_asan_rev.get(i - 1), i, "asan_fri_rev");
+                                    }
+                                    System.out.println(fri_asan_rev.size());
+                                    System.out.println("금 아산 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_asan.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_asan.get(i - 1), i, "asan_day");
+                                    }
+                                    System.out.println(day_asan.size());
+                                    System.out.println("평일 아산");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().contains("X")) {
+                                            fri_asan.add(e.text());
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_asan.get(i - 1), i, "asan_fri");
+                                    }
+                                    System.out.println(fri_asan.size());
+                                    System.out.println("금 아산");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_weekend_cheonan_asan_holi).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(3)");
+                                    Elements table2 = doc.select("div.table01 td:eq(4)");
+                                    Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sat_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_cheonan_rev.get(i - 1), i, "cheonan_sat_rev");
+                                    }
+                                    System.out.println(sat_cheonan_rev.size());
+                                    System.out.println("토 천안 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sat_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sat_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_asan_rev.get(i - 1), i, "asan_sat_rev");
+                                    }
+                                    System.out.println(sat_asan_rev.size());
+                                    System.out.println("토 아산 역");
+
+                                    for (Element e : table3) {
+                                        sat_cheonan_asan.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_cheonan_asan.get(i - 1), i, "cheonan_asan_sat");
+                                    }
+                                    System.out.println(sat_cheonan_asan.size());
+                                    System.out.println("토 천안아산");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_weekend_terminal_holi).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sat_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sat_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_terminal_rev.get(i - 1), i, "terminal_sat_rev");
+                                    }
+                                    System.out.println(sat_terminal_rev.size());
+                                    System.out.println("토 터미널 역");
+
+                                    for (Element e : table2) {
+                                        sat_terminal.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sat_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_terminal.get(i - 1), i, "terminal_sat");
+                                    }
+                                    System.out.println(sat_terminal.size());
+                                    System.out.println("토 터미널");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_weekend_cheonan_asan_holi).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(3)");
+                                    Elements table2 = doc.select("div.table01 td:eq(4)");
+                                    Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sun_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_cheonan_rev.get(i - 1), i, "cheonan_sun_rev");
+                                    }
+                                    System.out.println(sun_cheonan_rev.size());
+                                    System.out.println("일 천안 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sun_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sun_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_asan_rev.get(i - 1), i, "asan_sun_rev");
+                                    }
+                                    System.out.println(sun_asan_rev.size());
+                                    System.out.println("일 아산 역");
+
+                                    for (Element e : table3) {
+                                        sun_cheonan_asan.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_cheonan_asan.get(i - 1), i, "cheonan_asan_sun");
+                                    }
+                                    System.out.println(sun_cheonan_asan.size());
+                                    System.out.println("일 천안아산");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_weekend_terminal_holi).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sun_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sun_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_terminal_rev.get(i - 1), i, "terminal_sun_rev");
+                                    }
+                                    System.out.println(sun_terminal_rev.size());
+                                    System.out.println("일 터미널 역");
+
+                                    for (Element e : table2) {
+                                        sun_terminal.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sun_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_terminal.get(i - 1), i, "terminal_sun");
+                                    }
+                                    System.out.println(sun_terminal.size());
+                                    System.out.println("일 터미널");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+                            dbhelper.rev_boolean();
+                            dbhelper.update_holi_compare(1);
+                        } else {
+                            System.out.println("학기 크롤링 시작");
+                            if (dbhelper.table_exists()) {
+                                dbhelper.droptable();
+                            }
+                            dbhelper.createtable();
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_day_cheonan).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 0; i < day_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.insert(day_cheonan_rev.get(i));
+                                    }
+                                    dbhelper.insert("end");
+                                    System.out.println(day_cheonan_rev.size());
+                                    System.out.println("평일 천안 역");
+
+                                    for (Element e : table) {
+                                        if (!e.text().contains("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            fri_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_cheonan_rev.get(i - 1), i, "cheonan_fri_rev");
+                                    }
+                                    System.out.println(fri_cheonan_rev.size());
+                                    System.out.println("금 천안 역");
+
+                                    for (Element e : table3) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_cheonan.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_cheonan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_cheonan.get(i - 1), i, "cheonan_day");
+                                    }
+                                    System.out.println(day_cheonan.size());
+                                    System.out.println("평일 천안");
+
+                                    for (Element e : table3) {
+                                        if (!e.text().contains("X")) {
+                                            fri_cheonan.add(e.text());
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_cheonan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_cheonan.get(i - 1), i, "cheonan_fri");
+                                    }
+                                    System.out.println(fri_cheonan.size());
+                                    System.out.println("금 천안");
+
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_day_terminal).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_terminal_rev.get(i - 1), i, "terminal_day_rev");
+                                    }
+                                    System.out.println(day_terminal_rev.size());
+                                    System.out.println("평일 터미널 역");
+
+                                    for (Element e : table) {
+                                        if (!e.text().contains("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            fri_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_terminal_rev.get(i - 1), i, "terminal_fri_rev");
+                                    }
+                                    System.out.println(fri_terminal_rev.size());
+                                    System.out.println("금 터미널 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_terminal.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_terminal.get(i - 1), i, "terminal_day");
+                                    }
+                                    System.out.println(day_terminal.size());
+                                    System.out.println("평일 터미널");
+                                    for (Element e : table2) {
+                                        if (!e.text().contains("X")) {
+                                            fri_terminal.add(e.text());
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_terminal.get(i - 1), i, "terminal_fri");
+                                    }
+                                    System.out.println(fri_terminal.size());
+                                    System.out.println("금 터미널");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_day_asan).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_asan_rev.get(i - 1), i, "asan_day_rev");
+                                    }
+                                    System.out.println(day_asan_rev.size());
+                                    System.out.println("평일 아산 역");
+
+                                    for (Element e : table) {
+                                        if (!e.text().contains("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            fri_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_asan_rev.get(i - 1), i, "asan_fri_rev");
+                                    }
+                                    System.out.println(fri_asan_rev.size());
+                                    System.out.println("금 아산 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            day_asan.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= day_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(day_asan.get(i - 1), i, "asan_day");
+                                    }
+                                    System.out.println(day_asan.size());
+                                    System.out.println("평일 아산");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().contains("X")) {
+                                            fri_asan.add(e.text());
+                                        }
+                                    }
+                                    for (int i = 1; i <= fri_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(fri_asan.get(i - 1), i, "asan_fri");
+                                    }
+                                    System.out.println(fri_asan.size());
+                                    System.out.println("금 아산");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(3)");
+                                    Elements table2 = doc.select("div.table01 td:eq(4)");
+                                    Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sat_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_cheonan_rev.get(i - 1), i, "cheonan_sat_rev");
+                                    }
+                                    System.out.println(sat_cheonan_rev.size());
+                                    System.out.println("토 천안 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sat_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sat_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_asan_rev.get(i - 1), i, "asan_sat_rev");
+                                    }
+                                    System.out.println(sat_asan_rev.size());
+                                    System.out.println("토 아산 역");
+
+                                    for (Element e : table3) {
+                                        sat_cheonan_asan.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_cheonan_asan.get(i - 1), i, "cheonan_asan_sat");
+                                    }
+                                    System.out.println(sat_cheonan_asan.size());
+                                    System.out.println("토 천안아산");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_sat_terminal).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sat_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sat_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_terminal_rev.get(i - 1), i, "terminal_sat_rev");
+                                    }
+                                    System.out.println(sat_terminal_rev.size());
+                                    System.out.println("토 터미널 역");
+
+                                    for (Element e : table2) {
+                                        sat_terminal.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sat_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sat_terminal.get(i - 1), i, "terminal_sat");
+                                    }
+                                    System.out.println(sat_terminal.size());
+                                    System.out.println("토 터미널");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(3)");
+                                    Elements table2 = doc.select("div.table01 td:eq(4)");
+                                    Elements table3 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sun_cheonan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_cheonan_rev.get(i - 1), i, "cheonan_sun_rev");
+                                    }
+                                    System.out.println(sun_cheonan_rev.size());
+                                    System.out.println("일 천안 역");
+
+                                    for (Element e : table2) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sun_asan_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sun_asan_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_asan_rev.get(i - 1), i, "asan_sun_rev");
+                                    }
+                                    System.out.println(sun_asan_rev.size());
+                                    System.out.println("일 아산 역");
+
+                                    for (Element e : table3) {
+                                        sun_cheonan_asan.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_cheonan_asan.get(i - 1), i, "cheonan_asan_sun");
+                                    }
+                                    System.out.println(sun_cheonan_asan.size());
+                                    System.out.println("일 천안아산");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            while (true) {
+                                try {
+                                    i_error = 0;
+                                    publishProgress();
+                                    Document doc = Jsoup.connect(url_sun_terminal).get();
+
+                                    Elements table = doc.select("div.table01 td:eq(2)");
+                                    Elements table2 = doc.select("div.table01 td:eq(1)");
+
+                                    for (Element e : table) {
+                                        if (!e.text().equals("X")) {
+                                            String n[] = (e.text()).split("\\(");
+                                            sun_terminal_rev.add(n[0]);
+                                        }
+                                    }
+                                    for (int i = 1; i <= sun_terminal_rev.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_terminal_rev.get(i - 1), i, "terminal_sun_rev");
+                                    }
+                                    System.out.println(sun_terminal_rev.size());
+                                    System.out.println("일 터미널 역");
+
+                                    for (Element e : table2) {
+                                        sun_terminal.add(e.text());
+                                    }
+                                    for (int i = 1; i <= sun_terminal.size(); i++) {
+                                        System.out.println("포문");
+                                        dbhelper.update(sun_terminal.get(i - 1), i, "terminal_sun");
+                                    }
+                                    System.out.println(sun_terminal.size());
+                                    System.out.println("일 터미널");
+                                    break;
+                                } catch (IOException e) {
+                                    System.out.println("캐치");
+                                    i_error = 1;
+                                    publishProgress();
+                                    connect_internet();
+                                    e.printStackTrace();
+                                }
+                            }
+                            dbhelper.rev_boolean();
+                            dbhelper.update_holi_compare(0);
                         }
-                        for (int i = 1; i <= fri_asan.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(fri_asan.get(i - 1), i, "asan_fri");
-                        }
-                        System.out.println(fri_asan.size());
-                        System.out.println("금 아산");
-                        break;
-                    } catch (IOException e) {
-                        System.out.println("캐치");
-                        i_error = 1;
-                        publishProgress();
-                        connect_internet();
-                        e.printStackTrace();
                     }
                 }
-
-                while (true) {
-
-                    try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_sat_cheonan_asan).get();
-
-                        Elements table = doc.select("div.table01 td:eq(3)");
-                        Elements table2 = doc.select("div.table01 td:eq(4)");
-                        Elements table3 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                sat_cheonan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= sat_cheonan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sat_cheonan_rev.get(i - 1), i, "cheonan_sat_rev");
-                        }
-                        System.out.println(sat_cheonan_rev.size());
-                        System.out.println("토 천안 역");
-
-                        for (Element e : table2) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                sat_asan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= sat_asan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sat_asan_rev.get(i - 1), i, "asan_sat_rev");
-                        }
-                        System.out.println(sat_asan_rev.size());
-                        System.out.println("토 아산 역");
-
-                        for (Element e : table3) {
-                            sat_cheonan_asan.add(e.text());
-                        }
-                        for (int i = 1; i <= sat_cheonan_asan.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sat_cheonan_asan.get(i - 1), i, "cheonan_asan_sat");
-                        }
-                        System.out.println(sat_cheonan_asan.size());
-                        System.out.println("토 천안아산");
-                        break;
-                    } catch (IOException e) {
-                        System.out.println("캐치");
-                        i_error = 1;
-                        publishProgress();
-                        connect_internet();
-                        e.printStackTrace();
-                    }
-                }
-
-                while (true) {
-
-                    try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_sat_terminal).get();
-
-                        Elements table = doc.select("div.table01 td:eq(2)");
-                        Elements table2 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                sat_terminal_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= sat_terminal_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sat_terminal_rev.get(i - 1), i, "terminal_sat_rev");
-                        }
-                        System.out.println(sat_terminal_rev.size());
-                        System.out.println("토 터미널 역");
-
-                        for (Element e : table2) {
-                            sat_terminal.add(e.text());
-                        }
-                        for (int i = 1; i <= sat_terminal.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sat_terminal.get(i - 1), i, "terminal_sat");
-                        }
-                        System.out.println(sat_terminal.size());
-                        System.out.println("토 터미널");
-                        break;
-                    } catch (IOException e) {
-                        System.out.println("캐치");
-                        i_error = 1;
-                        publishProgress();
-                        connect_internet();
-                        e.printStackTrace();
-                    }
-                }
-
-                while (true) {
-                    try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_sun_cheonan_asan).get();
-
-                        Elements table = doc.select("div.table01 td:eq(3)");
-                        Elements table2 = doc.select("div.table01 td:eq(4)");
-                        Elements table3 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                sun_cheonan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= sun_cheonan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sun_cheonan_rev.get(i - 1), i, "cheonan_sun_rev");
-                        }
-                        System.out.println(sun_cheonan_rev.size());
-                        System.out.println("일 천안 역");
-
-                        for (Element e : table2) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                sun_asan_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= sun_asan_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sun_asan_rev.get(i - 1), i, "asan_sun_rev");
-                        }
-                        System.out.println(sun_asan_rev.size());
-                        System.out.println("일 아산 역");
-
-                        for (Element e : table3) {
-                            sun_cheonan_asan.add(e.text());
-                        }
-                        for (int i = 1; i <= sun_cheonan_asan.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sun_cheonan_asan.get(i - 1), i, "cheonan_asan_sun");
-                        }
-                        System.out.println(sun_cheonan_asan.size());
-                        System.out.println("일 천안아산");
-                        break;
-                    } catch (IOException e) {
-                        System.out.println("캐치");
-                        i_error = 1;
-                        publishProgress();
-                        connect_internet();
-                        e.printStackTrace();
-                    }
-                }
-                while (true) {
-                    try {
-                        i_error = 0;
-                        publishProgress();
-                        Document doc = Jsoup.connect(url_sun_terminal).get();
-
-                        Elements table = doc.select("div.table01 td:eq(2)");
-                        Elements table2 = doc.select("div.table01 td:eq(1)");
-
-                        for (Element e : table) {
-                            if (!e.text().equals("X")) {
-                                String n[] = (e.text()).split("\\(");
-                                sun_terminal_rev.add(n[0]);
-                            }
-                        }
-                        for (int i = 1; i <= sun_terminal_rev.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sun_terminal_rev.get(i - 1), i, "terminal_sun_rev");
-                        }
-                        System.out.println(sun_terminal_rev.size());
-                        System.out.println("일 터미널 역");
-
-                        for (Element e : table2) {
-                            sun_terminal.add(e.text());
-                        }
-                        for (int i = 1; i <= sun_terminal.size(); i++) {
-                            System.out.println("포문");
-                            dbhelper.update(sun_terminal.get(i - 1), i, "terminal_sun");
-                        }
-                        System.out.println(sun_terminal.size());
-                        System.out.println("일 터미널");
-                        break;
-                    } catch (IOException e) {
-                        System.out.println("캐치");
-                        i_error = 1;
-                        publishProgress();
-                        connect_internet();
-                        e.printStackTrace();
-                    }
-                }
-
-                dbhelper.true_boolean();
             }
-
-
             //측정 종료
             time();
             System.out.println("쓰레드 종료");
@@ -637,18 +1954,15 @@ public class Frag3 extends Fragment {
         }
 
         @Override
-        protected void onProgressUpdate(Void... string)
-        {
-            if( i_error == 0)
-            {
+        protected void onProgressUpdate(Void... string) {
+            if (i_error == 0) {
                 asyncDialog.setMessage("loading...");
-            }
-            else
-            {
+            } else {
                 asyncDialog.setMessage("인터넷 연결상태를 확인해주세요");
             }
 
         }
+
         @Override
         protected void onPostExecute(Void s) {
 
@@ -667,14 +1981,13 @@ public class Frag3 extends Fragment {
     }
 
     //시간 측정
-    private void time()
-    {
+    private void time() {
         long now = System.currentTimeMillis();
-            Date date = new Date(now);
-            @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
-            String formatDate = sdfNow.format(date);
-            System.out.println(formatDate);
+        Date date = new Date(now);
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat sdfNow = new SimpleDateFormat("HH:mm:ss");
+        String formatDate = sdfNow.format(date);
+        System.out.println(formatDate);
     }
 
 
@@ -770,8 +2083,7 @@ public class Frag3 extends Fragment {
     }
 
     //arrary_list text_view 생성 추가
-    private void text_view_add(ArrayList<String> array1, ArrayList<String> array2)
-    {
+    private void text_view_add(ArrayList<String> array1, ArrayList<String> array2) {
         int Textview_num1 = array1.size();
         int Textview_num2 = array2.size();
 
@@ -801,8 +2113,7 @@ public class Frag3 extends Fragment {
         }
     }
 
-    private void crrent_time_table(int x, int y)
-    {
+    private void crrent_time_table(int x, int y) {
         textViews1[x].setTextColor(Color.rgb(248, 91, 78));
         scroll_vertical_layout1.removeViewAt(x);
         scroll_vertical_layout1.addView(textViews1[x], x);
@@ -853,14 +2164,14 @@ public class Frag3 extends Fragment {
                             empty_array2.addAll(day_asan_rev);
                         }
 
-                        text_view_add(empty_array1,empty_array2);
+                        text_view_add(empty_array1, empty_array2);
 
 
                         if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
                             int y = current_time(empty_array2);
 
-                            crrent_time_table(x,y);
+                            crrent_time_table(x, y);
 
                             scroll_ani(x, y);
                         } else {
@@ -885,13 +2196,13 @@ public class Frag3 extends Fragment {
                             empty_array2.addAll(day_cheonan_rev);
                         }
 
-                        text_view_add(empty_array1,empty_array2);
+                        text_view_add(empty_array1, empty_array2);
 
                         if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
                             int y = current_time(empty_array2);
 
-                            crrent_time_table(x,y);
+                            crrent_time_table(x, y);
 
                             scroll_ani(x, y);
                         } else {
@@ -916,14 +2227,14 @@ public class Frag3 extends Fragment {
                             empty_array2.addAll(day_terminal_rev);
                         }
 
-                        text_view_add(empty_array1,empty_array2);
+                        text_view_add(empty_array1, empty_array2);
 
 
                         if (singleSelectToggleGroup.getCheckedId() == curr_Day) {
                             int x = current_time(empty_array1);
                             int y = current_time(empty_array2);
 
-                            crrent_time_table(x,y);
+                            crrent_time_table(x, y);
 
                             scroll_ani(x, y);
                         } else {
@@ -1000,14 +2311,14 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_a == curr_Day) {
                         int x = current_time(empty_array3);
 
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1031,13 +2342,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_b == curr_Day) {
                         int x = current_time(empty_array3);
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1061,13 +2372,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_c == curr_Day) {
                         int x = current_time(empty_array3);
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1090,13 +2401,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(day_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_d == curr_Day) {
                         int x = current_time(empty_array3);
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1119,13 +2430,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(fri_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_e == curr_Day) {
                         int x = current_time(empty_array3);
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1149,13 +2460,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(sat_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_f == curr_Day) {
                         int x = current_time(empty_array3);
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
                     } else {
@@ -1178,13 +2489,13 @@ public class Frag3 extends Fragment {
                         empty_array4.addAll(sun_terminal_rev);
                     }
 
-                    text_view_add(empty_array3,empty_array4);
+                    text_view_add(empty_array3, empty_array4);
 
                     if (R.id.choice_g == curr_Day) {
                         int x = current_time(empty_array3);
                         int y = current_time(empty_array4);
 
-                        crrent_time_table(x,y);
+                        crrent_time_table(x, y);
 
                         scroll_ani(x, y);
 
