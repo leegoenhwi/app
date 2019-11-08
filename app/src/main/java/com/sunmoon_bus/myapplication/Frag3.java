@@ -255,6 +255,7 @@ public class Frag3 extends Fragment {
             time();
             String holiday = null;
             String today = get_today();
+            //아ㅓㄴ말
 
             if (dbhelper.read_boolean().equals("false")) {
                 if (dbhelper.table_exists()) {
