@@ -1,6 +1,9 @@
 package com.sunmoon_bus.myapplication;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -25,6 +28,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.navigation.NavigationView;
 
+import java.text.SimpleDateFormat;
 import java.util.Objects;
 
 
@@ -41,17 +45,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Frag3 frag3;
     private Fragment fragment;
     private CustomDialog dialog; // 알림창
-    //private infor_Dialog inforDialog; // 도움말
+    private popup_dialog popup; // 공지사항
     private NavigationView navigationView;
     private BottomSheetDialog bottomSheetDialog;
     private Button infor_butt;
     //private BottomSheetDialog
     private AdView mAdView;
+    private SharedPreferences sp;
+    private String day;
 
+
+
+
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // activiry_main 레이아웃과 연결
+
+
 
         tb = (Toolbar) findViewById(R.id.app_toolbar); // 툴바 변수명 설정
         dlDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -68,16 +80,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         frag2 = new Frag2(); //프래그먼트 객채셍성
         frag3 = new Frag3(); //프래그먼트 객채셍성
         fragment = new Fragment();
+
         dialog = new CustomDialog(MainActivity.this,leftListener); // 커스텀 다이얼로그를 생성한다. 사용자가 만든 클래스이다.
         bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
         bottomSheetDialog.setContentView(R.layout.infor_dialog);
+
+        popup = new popup_dialog(MainActivity.this,getLeftListener,getRightListener);// 공지사항
 
         infor_butt = (Button)bottomSheetDialog.findViewById(R.id.infor_butt);
 
         infor_butt.setOnClickListener(MainActivity.this);
 
+        day = get_today();
 
+        System.out.println("날짜");
+        System.out.println(day);
 
+        //변수 생성 및 초기화
+        sp = getSharedPreferences("fake_db", Activity.MODE_PRIVATE);
 
         setFrag(0); //프래그먼트 초기화 함수
         initNavigationDrawer(); // 드로어 네비게이션 뷰 초기화 함수
@@ -91,6 +111,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAdView.loadAd(adRequest);
 
 
+
+        popup_compare();
+
     }
 
 
@@ -102,6 +125,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
     }
 
+    //공지사항
+    public void popup()
+    {
+        popup.setCanceledOnTouchOutside(false);
+        popup.setCancelable(true);
+        popup.show();
+    }
+
+    //현재날짜 가져오기
+    private String get_today() {
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy/MM/dd");
+
+        String format_time1 = format1.format(System.currentTimeMillis());
+
+        return format_time1;
+    }
+
+    //오늘 그만보기 비교
+    @SuppressLint("ApplySharedPref")
+    public void popup_compare(){
+            if(sp.getString("popup", "false").equals(day))
+            {
+
+            }
+            else{
+
+                popup();
+            }
+     }
 
 
     //다이얼로그 클릭이벤트
@@ -110,6 +162,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             dialog.dismiss();
         }
     };
+
+
+    //공지사항 클릭이벤트
+    //확인
+    private View.OnClickListener getLeftListener = new View.OnClickListener(){
+        public void onClick(View v){
+            popup.dismiss();
+        }
+    };
+    //오늘하루 그만보기
+    private View.OnClickListener getRightListener = new View.OnClickListener(){
+        @SuppressLint("ApplySharedPref")
+        public void onClick(View v){
+            @SuppressLint("CommitPrefEdits")
+            SharedPreferences.Editor edit = sp.edit();
+
+            edit.putString("popup",day);
+
+            edit.commit();
+            popup.dismiss();
+        }
+    };
+
+
 
 
 
@@ -151,6 +227,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         break;
 
+                    case R.id.n_t:
+
+                        break;
+
                     case R.id.infor:
 
                         break;
@@ -166,11 +246,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         switch (id) {
                             case R.id.bus_time:
                                 break;
+                            case R.id.n_t:
+                                popup();
+                                break;
                             case R.id.notice:
                                 Dialog();
                                 break;
                             case R.id.infor:
-                                //infor_Dialog();
                                 bottomSheetDialog.show();
                                 break;
                             case R.id.gps:

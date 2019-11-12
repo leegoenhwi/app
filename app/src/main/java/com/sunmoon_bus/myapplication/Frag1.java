@@ -699,34 +699,6 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 }
 
 
-               /* Elements gps = doc.select("div.0");
-
-                Elements gps2 = doc.select("div.1");
-
-                Elements gps3 = doc.select("div.2");
-
-                s_gps1 = gps.text().split(" ");
-
-                s_gps2 = gps2.text().split(" ");
-
-                s_gps3 = gps3.text().split(" ");
-
-
-                if (numberArray[1] == 0 && Integer.parseInt(s_gps1[0]) == 1) {
-                    set_marker1 = new LatLng(Double.parseDouble(s_gps1[1]), Double.parseDouble(s_gps1[2]));
-                    numberArray[1]++;
-                }
-
-                if (numberArray[2] == 0 && Integer.parseInt(s_gps2[0]) == 2)
-                    set_marker2 = new LatLng(Double.parseDouble(s_gps2[1]), Double.parseDouble(s_gps2[2]));
-                  numberArray[2]++;
-
-
-                if(numberArray[3] == 0 && Integer.parseInt(s_gps3[0]) == 3) {
-                    set_marker3 = new LatLng(Double.parseDouble(s_gps3[1]), Double.parseDouble(s_gps3[2]));
-                    numberArray[3]++;
-                }*/
-
                 try {
                     publishProgress();
                     Thread.sleep(5000);

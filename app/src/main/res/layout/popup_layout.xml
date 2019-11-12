@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="400dp"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:weightSum="35"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/popup_title"
+        android:layout_weight="5"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:textSize="19sp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:text="공지사항"
+        android:background="@color/colormain"
+        android:fontFamily="@font/spoqa_han_sans_bold" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/popup_scroll"
+        android:layout_weight="26"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true">
+
+        <ListView
+            android:id="@+id/popup_listview"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="#CFCFCF"
+            android:dividerHeight="0.3dp"
+            />
+
+    </androidx.core.widget.NestedScrollView>
+
+
+
+    <LinearLayout
+        android:layout_weight="4"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="0dp"
+        android:divider="#CFCFCF">
+
+    <Button
+        android:id="@+id/popup_btn"
+        android:layout_width="150dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/custom_ripple_effect"
+        android:textColor="#000000"
+        android:text="오늘하루 그만보기"
+        android:textSize="13dp"
+        android:elevation="8dp"
+        tools:ignore="SpUsage"
+        android:fontFamily="@font/spoqa_han_sans_regular"/>
+
+        <Button
+            android:id="@+id/popup_btn2"
+            android:layout_width="150dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/custom_ripple_effect"
+            android:textColor="#000000"
+            android:text="@string/ok"
+            android:textSize="13dp"
+            android:elevation="8dp"
+            android:padding="2dp"
+            tools:ignore="SpUsage"
+            android:fontFamily="@font/spoqa_han_sans_regular"/>
+
+    </LinearLayout>
+
+</LinearLayout>

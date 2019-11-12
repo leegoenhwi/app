@@ -29,6 +29,11 @@
             android:title="버전 정보"
             android:icon="@drawable/ic_assignment_black_24dp"/>
 
+    <item
+        android:id="@+id/n_t"
+        android:title="공지사항"
+        android:icon="@drawable/ic_report_problem_black_24dp"/>
+
 
     <item
         android:id="@+id/infor"
