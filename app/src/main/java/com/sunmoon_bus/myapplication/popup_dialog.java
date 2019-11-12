@@ -3,6 +3,7 @@ package com.sunmoon_bus.myapplication;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,13 @@ import android.widget.ListView;
 
 import androidx.core.widget.NestedScrollView;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class popup_dialog extends Dialog {
@@ -21,6 +29,10 @@ public class popup_dialog extends Dialog {
     private ListView listView;
     private NestedScrollView popup_scroll;
     private  ListViewAdapter adapter;
+    private String notice_url = "http://119.67.32.123:8840/bus_notice.php";
+    private ArrayList<String> time = new ArrayList<String>();
+    private ArrayList<String> title = new ArrayList<String>();
+    private ArrayList<String> content = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,4 +128,33 @@ public class popup_dialog extends Dialog {
 
 
 
+    private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Document doc = Jsoup.connect(notice_url).get();
+
+                Elements sets = doc.select("div");
+                int i=0;
+                for (Element e: sets) {
+                    Elements set = doc.select("div."+i+"");
+                    String n[] = (set.text().split("&& "));
+                    time.add(n[0]);
+                    title.add(n[1]);
+                    content.add(n[2]);
+                    i++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+    }
 }
