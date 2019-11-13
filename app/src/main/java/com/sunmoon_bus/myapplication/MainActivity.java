@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main); // activiry_main 레이아웃과 연결
 
 
-
         tb = (Toolbar) findViewById(R.id.app_toolbar); // 툴바 변수명 설정
         dlDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_nav);
@@ -86,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomSheetDialog.setContentView(R.layout.infor_dialog);
 
         popup = new popup_dialog(MainActivity.this,getLeftListener,getRightListener);// 공지사항
+
+        popup.create();
 
         infor_butt = (Button)bottomSheetDialog.findViewById(R.id.infor_butt);
 
@@ -111,7 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAdView.loadAd(adRequest);
 
 
-
+        popup.setCanceledOnTouchOutside(false);
+        popup.setCancelable(true);
         popup_compare();
 
     }
@@ -125,13 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
     }
 
-    //공지사항
-    public void popup()
-    {
-        popup.setCanceledOnTouchOutside(false);
-        popup.setCancelable(true);
-        popup.show();
-    }
+
 
     //현재날짜 가져오기
     private String get_today() {
@@ -151,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else{
 
-                popup();
+                popup.show();
             }
      }
 
@@ -247,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case R.id.bus_time:
                                 break;
                             case R.id.n_t:
-                                popup();
+                                popup.show();
                                 break;
                             case R.id.notice:
                                 Dialog();

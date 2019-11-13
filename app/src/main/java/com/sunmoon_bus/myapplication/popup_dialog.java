@@ -33,7 +33,9 @@ public class popup_dialog extends Dialog {
     private ArrayList<String> time = new ArrayList<String>();
     private ArrayList<String> title = new ArrayList<String>();
     private ArrayList<String> content = new ArrayList<String>();
+    private JsoupAsyncTask jsk;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,9 +56,16 @@ public class popup_dialog extends Dialog {
 
         Button mLeftButton = (Button) findViewById(R.id.popup_btn);
 
+        listView =(ListView)findViewById(R.id.popup_listview);
 
-        //내용 초기화
-        listview_insert();
+        // Adapter 생성
+        adapter = new ListViewAdapter();
+
+        listView.setAdapter(adapter);
+
+        //어싱크테스크 객체 생성
+        jsk = new JsoupAsyncTask();
+        jsk.execute();
 
 
         // 클릭 이벤트 셋팅
@@ -67,28 +76,6 @@ public class popup_dialog extends Dialog {
             mLeftButton.setOnClickListener(mRightClickLinstener);
         }
 
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void listview_insert()
-    {
-        listView =(ListView)findViewById(R.id.popup_listview);
-
-        // Adapter 생성
-        adapter = new ListViewAdapter();
-
-        listView.setAdapter(adapter);
-
-        adapter.addItem("2019.11.02","11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111","타이틀");
-        adapter.addItem("2019.10.21","내용","타이틀");
-        adapter.addItem("2019.10.07","내용","타이틀");
-        adapter.addItem("2019.09.29","내용","타이틀");
-        adapter.addItem("2019.08.15","내용","타이틀");
-        adapter.addItem("2019.08.12","내용","타이틀");
-        adapter.addItem("2019.08.09","내용","타이틀");
-        adapter.addItem("2019.08.07","내용","타이틀");
-        adapter.addItem("2019.08.05","내용","타이틀");
-
         //터치 이벤트
         listView.setOnTouchListener(new View.OnTouchListener() {        //리스트뷰 터취 리스너
             @Override
@@ -97,6 +84,7 @@ public class popup_dialog extends Dialog {
                 return false;
             }
         });
+
 
         //클릭 이벤트
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -118,6 +106,15 @@ public class popup_dialog extends Dialog {
 
     }
 
+    @Override
+    public void onStart()
+    {
+        System.out.println("온스타트");
+        super.onStart();
+    }
+
+
+
 
     popup_dialog(Context context, View.OnClickListener singleListener, View.OnClickListener Listenenr) {
         super(context);
@@ -130,6 +127,8 @@ public class popup_dialog extends Dialog {
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
+        int error;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -137,24 +136,51 @@ public class popup_dialog extends Dialog {
 
         @Override
         protected Void doInBackground(Void... params) {
+
+            System.out.println("팝업 어싱크 테스크 시작");
+
             try {
                 Document doc = Jsoup.connect(notice_url).get();
 
                 Elements sets = doc.select("div");
+
                 int i=0;
+
                 for (Element e: sets) {
                     Elements set = doc.select("div."+i+"");
                     String n[] = (set.text().split("&& "));
                     time.add(n[0]);
-                    title.add(n[1]);
-                    content.add(n[2]);
+                    content.add(n[1]);
+                    title.add(n[2]);
                     i++;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("트라이 캐치");
+                error = 1;
+                return null;
             }
+            System.out.println(error);
+            error = 0;
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void s) {
+
+            if(error == 1)
+            {
+                adapter.addItem("메시지가 없습니다.","","");
+            }
+            else
+            {
+                for(int i = 0;i < time.size();i++)
+                {
+                    adapter.addItem(time.get(i),title.get(i),content.get(i));
+                }
+            }
+        }
+
+
 
     }
 }
