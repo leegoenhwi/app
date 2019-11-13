@@ -43,7 +43,8 @@
             android:name="com.sunmoon_bus.myapplication.SplashActivity"
             android:theme="@style/SplashTheme"
             android:supportsPictureInPicture="false"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:clearTaskOnLaunch = "true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -359,7 +359,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             time=System.currentTimeMillis();
             Toast.makeText(getApplicationContext(),"뒤로 버튼을 한번 더 누르면 종료합니다.",Toast.LENGTH_SHORT).show();
         }else if(System.currentTimeMillis()-time<2000){
-            finish();
+           finish();
+
         }
     }
 
@@ -371,6 +372,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.infor_butt: bottomSheetDialog.dismiss();
                 break;
         }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        System.exit(0);
+        super.onDestroy();
     }
 }
 
