@@ -15,6 +15,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -53,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AdView mAdView;
     private SharedPreferences sp;
     private String day;
-
+    private final String PREF_FIRST_START = "AppFirstLaunch";
+    private  SharedPreferences settings;
 
 
 
@@ -100,14 +104,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //변수 생성 및 초기화
         sp = getSharedPreferences("fake_db", Activity.MODE_PRIVATE);
 
+        home_icon();
+
         setFrag(0); //프래그먼트 초기화 함수
         initNavigationDrawer(); // 드로어 네비게이션 뷰 초기화 함수
         bottomNavigationView(); // 바텀 네비게이션 뷰 초기화 함수
 
+        MobileAds.initialize(this,"ca-app-pub-5331304879189183~1559540203");
 
-
-        MobileAds.initialize(this, "ca-app-pub-5331304879189183~1559540203");
-        mAdView = findViewById(R.id.adView);
+        mAdView = findViewById(R.id.adview);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
@@ -128,6 +133,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    //홈 화면에 추가
+    private void home_icon()
+    {
+       settings = getSharedPreferences(PREF_FIRST_START, 0);
+
+
+        if(settings.getBoolean("AppFirstLaunch", true)){  // 아이콘이 두번 추가 안되도록 하기 위해서 필요한 체크입니다.
+
+
+            settings.edit().putBoolean("AppFirstLaunch", false).commit();
+
+            if (ShortcutManagerCompat.isRequestPinShortcutSupported(this))
+            {
+                ShortcutInfoCompat shortcutInfo = new ShortcutInfoCompat.Builder(this, "#1")
+                        .setIntent(new Intent(this, MainActivity.class).setAction(Intent.ACTION_MAIN)) // !!! intent's action must be set on oreo
+                        .setShortLabel(getString(R.string.app_name)) //  아이콘에 같이 보여질 이름
+                        .setIcon(IconCompat.createWithResource(this, R.mipmap.ic_launcher_icon_round))  //아이콘에 보여질 이미지
+                        .build();
+                ShortcutManagerCompat.requestPinShortcut(this, shortcutInfo, null);
+            }
+            else
+            {
+                // Shortcut is not supported by your launcher
+            }
+
+        }
+    }
 
     //현재날짜 가져오기
     private String get_today() {

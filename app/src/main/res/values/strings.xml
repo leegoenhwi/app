@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">해달버스</string>
-    <string name="main_title">선문버스</string>
+    <string name="main_title">해달버스</string>
     <string name="todo">TODO</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
