@@ -3,7 +3,7 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.sunmoon_bus.myapplication"
     android:versionCode="1"
-    android:versionName="2.5">
+    android:versionName="2.6">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
@@ -46,7 +46,8 @@
             android:theme="@style/SplashTheme"
             android:supportsPictureInPicture="false"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:clearTaskOnLaunch = "true">
+            android:clearTaskOnLaunch = "true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -58,7 +59,8 @@
             android:name="com.sunmoon_bus.myapplication.MainActivity"
             android:theme="@style/AppTheme"
             android:supportsPictureInPicture="false"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation">
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="portrait">
         </activity>
 
 

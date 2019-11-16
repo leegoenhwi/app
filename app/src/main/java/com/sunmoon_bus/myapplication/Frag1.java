@@ -45,13 +45,10 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
     private GoogleMap mygoogleMap;
     private boolean stopFlag = false;
-    private Marker bus_marker = null;
-    private Marker bus_marker2 = null;
-    private Marker bus_marker3 = null;
+
+    private ArrayList<Marker> bus_markers;
 
     private JAT task ;
-
-    private int [] numberArray = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
     private Marker ch_marker = null,osa_marker = null,ter_marker = null ,sunmoon_marker = null;
 
@@ -59,6 +56,9 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
     private int gps_count = 1;
 
+    private int bus_count = 0;
+
+    private Marker bus_marker_token = null;
 
     public Frag1() {
     }
@@ -86,9 +86,8 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
         mapView = (MapView)view.findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
 
-        bus_marker = null;
-        bus_marker2 = null;
-        bus_marker3 = null;
+        bus_markers = new ArrayList<Marker>();
+
 
         set_marker = new ArrayList<LatLng>();
         s_gps = new String[]{"0", "0", "0"};
@@ -128,6 +127,8 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     {
         mapView.onPause();
         stopFlag = true;
+        bus_markers.clear();
+        bus_marker_token = null;
         task.cancel(true);
         System.out.println("온퓨즈");
 
@@ -217,48 +218,39 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     private void in_gps_bus()
     {
 
-       if(bus_marker != null)
+
+       if(bus_marker_token != null)
         {
             System.out.println("버스 마커 업데이트");
 
 
-            bus_marker.setPosition(set_marker.get(0));
+            for(int i = 0;i<bus_count;i++)
+            {
+                bus_markers.get(i).setPosition(set_marker.get(i));
+            }
 
-            bus_marker2.setPosition(set_marker.get(1));
-
-            bus_marker3.setPosition(set_marker.get(2));
 
         }
 
-        if(bus_marker == null) {
+        if(bus_marker_token == null) {
             System.out.println("버스 마커 생김");
-            bus_marker = mygoogleMap.addMarker(new MarkerOptions()
-                    .position(set_marker.get(0))
-                    .title("셔틀 버스")
-                    .anchor(0.5f,0.5f));
 
-            bus_marker.setIcon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()));
+            for(int i = 0;i<bus_count;i++)
+            {
+
+                bus_marker_token = mygoogleMap.addMarker(new MarkerOptions()
+                        .position(set_marker.get(i))
+                        .title("셔틀 버스")
+                        .anchor(0.5f,0.5f));
+
+                bus_marker_token.setIcon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()));
+                bus_marker_token.setZIndex(10);
+
+                bus_markers.add(bus_marker_token);
+
+            }
 
 
-            bus_marker2 = mygoogleMap.addMarker(new MarkerOptions()
-                    .position(set_marker.get(1))
-                    .title("셔틀 버스")
-                    .anchor(0.5f,0.5f));
-
-            bus_marker2.setIcon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()));
-
-
-            bus_marker3 = mygoogleMap.addMarker(new MarkerOptions()
-                    .position(set_marker.get(2))
-                    .title("셔틀 버스")
-                    .anchor(0.5f,0.5f));
-
-            bus_marker3.setIcon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()));
-
-          //z인덱스
-            bus_marker.setZIndex(10);
-            bus_marker2.setZIndex(10);
-            bus_marker3.setZIndex(10);
         }
 
 
@@ -589,8 +581,6 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
         //고정 마커 초기화 함수
     private void initi_fix_marker(GoogleMap googleMap)
     {
-        //마커 객체 생성
-       // final Marker ch_marker,osa_marker,ter_marker,sunmoon_marker;
 
         //마커 생성
         sunmoon_marker = googleMap.addMarker(new MarkerOptions()
@@ -646,16 +636,19 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
             Document doc;
 
+
             while (!stopFlag) {
                 System.out.println("온두인백그라운드");
 
-                numberArray = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+                int [] numberArray = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+                bus_count = 0;
                 gps_count = 1;
 
                 if(!set_marker.isEmpty()) {
                     set_marker.clear();
                 }
+
 
                 try {
 
@@ -682,24 +675,25 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 System.out.println(gps.text());
                 gps_split = gps.text().split(" ");
 
-
                 for(int i=0;i<gps_split.length/5;i++) {
                     for (int j = 0; j < 3; j++) {
                         s_gps[j] = gps_split[i * 5 + j];
+                        System.out.println("좌표");
                         System.out.println(s_gps[j]);
                     }
                      if(numberArray[gps_count] == 0 && Integer.parseInt(s_gps[0]) == gps_count) {
                          set_marker.add(new LatLng(Double.parseDouble(s_gps[1]), Double.parseDouble(s_gps[2])));
-                         //System.out.println(set_marker.get(i));
+
                          gps_count++;
+                         bus_count++;
                      }
-                     //System.out.println(s_gps[i]);
-                    // System.out.println(set_marker.get(i));
-                   // System.out.println(i);
+
                 }
 
 
                 try {
+                    System.out.println("버스 카운터");
+                    System.out.println(bus_count);
                     publishProgress();
                     Thread.sleep(5000);
 
