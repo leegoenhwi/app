@@ -167,6 +167,9 @@ public class popup_dialog extends Dialog {
         @Override
         protected void onPostExecute(Void s) {
 
+
+
+
             if(error == 1)
             {
                 adapter.addItem("메시지가 없습니다.","","");
@@ -176,11 +179,11 @@ public class popup_dialog extends Dialog {
                 for(int i = 0;i < time.size();i++)
                 {
                     adapter.addItem(time.get(i),title.get(i),content.get(i));
+
+                    }
                 }
             }
         }
 
 
-
-    }
 }

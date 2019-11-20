@@ -127,8 +127,6 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     {
         mapView.onPause();
         stopFlag = true;
-        bus_markers.clear();
-        bus_marker_token = null;
         task.cancel(true);
         System.out.println("온퓨즈");
 
@@ -219,20 +217,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     {
 
 
-       if(bus_marker_token != null)
-        {
-            System.out.println("버스 마커 업데이트");
-
-
-            for(int i = 0;i<bus_count;i++)
-            {
-                bus_markers.get(i).setPosition(set_marker.get(i));
-            }
-
-
-        }
-
-        if(bus_marker_token == null) {
+        if(bus_markers.isEmpty()) {
             System.out.println("버스 마커 생김");
 
             for(int i = 0;i<bus_count;i++)
@@ -241,16 +226,27 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 bus_marker_token = mygoogleMap.addMarker(new MarkerOptions()
                         .position(set_marker.get(i))
                         .title("셔틀 버스")
-                        .anchor(0.5f,0.5f));
+                        .anchor(0.5f,0.5f)
+                        .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()))
+                        .zIndex(10));
 
-                bus_marker_token.setIcon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()));
-                bus_marker_token.setZIndex(10);
 
                 bus_markers.add(bus_marker_token);
 
             }
 
 
+        }
+
+        else{
+            System.out.println("버스 마커 업데이트");
+
+
+            for(int i = 0;i<bus_count;i++)
+            {
+                bus_markers.get(i).setPosition(set_marker.get(i));
+
+            }
         }
 
 
@@ -678,12 +674,13 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 for(int i=0;i<gps_split.length/5;i++) {
                     for (int j = 0; j < 3; j++) {
                         s_gps[j] = gps_split[i * 5 + j];
-                        System.out.println("좌표");
-                        System.out.println(s_gps[j]);
+                        //System.out.println("좌표");
+                        //System.out.println(s_gps[j]);
                     }
                      if(numberArray[gps_count] == 0 && Integer.parseInt(s_gps[0]) == gps_count) {
                          set_marker.add(new LatLng(Double.parseDouble(s_gps[1]), Double.parseDouble(s_gps[2])));
-
+                         System.out.println("set_marker");
+                         System.out.println(set_marker.get(bus_count));
                          gps_count++;
                          bus_count++;
                      }
