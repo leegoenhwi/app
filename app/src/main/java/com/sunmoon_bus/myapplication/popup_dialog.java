@@ -3,6 +3,8 @@ package com.sunmoon_bus.myapplication;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -35,6 +37,11 @@ public class popup_dialog extends Dialog {
     private ArrayList<String> content = new ArrayList<String>();
     private JsoupAsyncTask jsk;
 
+
+    private static final int TYPE_WIFI = 1;
+    private static final int TYPE_MOBILE = 2;
+    private static final int TYPE_NOT_CONNECTED = 3;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +72,14 @@ public class popup_dialog extends Dialog {
 
         //어싱크테스크 객체 생성
         jsk = new JsoupAsyncTask();
-        jsk.execute();
+
+        if(getConnectivityStatus(getContext()) != TYPE_NOT_CONNECTED)
+        {
+            jsk.execute();
+        }
+        else {
+            adapter.addItem("메시지가 없습니다.","","");
+        }
 
 
         // 클릭 이벤트 셋팅
@@ -106,6 +120,23 @@ public class popup_dialog extends Dialog {
 
     }
 
+    //인터넷 연결상태 확인
+    private static int getConnectivityStatus(Context context) { //해당 context의 서비스를 사용하기위해서 context객체를 받는다.
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo != null) {
+            int type = networkInfo.getType();
+            if (type == ConnectivityManager.TYPE_MOBILE) {//쓰리지나 LTE로 연결된것(모바일을 뜻한다.)
+                return TYPE_MOBILE;
+            } else if (type == ConnectivityManager.TYPE_WIFI) {//와이파이 연결된것
+                return TYPE_WIFI;
+            }
+        }
+        return TYPE_NOT_CONNECTED;  //연결이 되지않은 상태
+    }
+
+
     @Override
     public void onStart()
     {
@@ -125,9 +156,10 @@ public class popup_dialog extends Dialog {
 
 
 
+    @SuppressLint("StaticFieldLeak")
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        int error;
+
 
         @Override
         protected void onPreExecute() {
@@ -137,7 +169,9 @@ public class popup_dialog extends Dialog {
         @Override
         protected Void doInBackground(Void... params) {
 
+
             System.out.println("팝업 어싱크 테스크 시작");
+
 
             try {
                 Document doc = Jsoup.connect(notice_url).get();
@@ -156,11 +190,11 @@ public class popup_dialog extends Dialog {
                 }
             } catch (IOException e) {
                 System.out.println("트라이 캐치");
-                error = 1;
+
                 return null;
             }
-            System.out.println(error);
-            error = 0;
+            //System.out.println(error);
+
             return null;
         }
 
@@ -168,22 +202,26 @@ public class popup_dialog extends Dialog {
         protected void onPostExecute(Void s) {
 
 
-
-
-            if(error == 1)
+            if(!time.isEmpty())
             {
-                adapter.addItem("메시지가 없습니다.","","");
-            }
-            else
-            {
+                System.out.println("연결확인");
                 for(int i = 0;i < time.size();i++)
                 {
                     adapter.addItem(time.get(i),title.get(i),content.get(i));
 
-                    }
                 }
             }
+
+            else
+            {
+                System.out.println("연결안됨");
+                adapter.addItem("","","메시지가 없습니다.");
+            }
+
+
         }
+    }
+
 
 
 }

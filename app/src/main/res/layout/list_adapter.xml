@@ -8,12 +8,13 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/imageView1"
-        android:layout_weight="1" />
+        android:layout_weight="0.5" />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants"
         android:layout_weight="6">
 
         <TextView
@@ -27,19 +28,24 @@
             android:layout_height="wrap_content"
             android:layout_weight="7"
             android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="New Text"
-            android:id="@+id/list_day"
-            android:textSize="13dp"
-            android:textColor="#666666"
-            android:gravity="center_vertical"
-            android:layout_weight="2"
-            tools:ignore="InefficientWeight,NestedWeights,SpUsage" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="New Text"
+                android:id="@+id/list_day"
+                android:textSize="13dp"
+                android:textColor="#666666"
+                android:gravity="center_vertical"
+                android:layout_weight="2"
+                tools:ignore="InefficientWeight,NestedWeights,SpUsage" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.1"
+                tools:ignore="UselessLeaf" />
             <TextView
                 android:layout_height="match_parent"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_weight="5"
                 android:id="@+id/list_title"
                 android:text="New Text"
@@ -58,6 +64,8 @@
             android:gravity="center_vertical"
             android:layout_weight="2"
             android:visibility="gone"
+            android:autoLink="web"
+            android:linksClickable="true"
             tools:ignore="SpUsage" />
 
         <TextView
@@ -72,6 +80,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/imageView2"
-        android:layout_weight="1" />
+        android:layout_weight="0.5" />
 
 </LinearLayout>

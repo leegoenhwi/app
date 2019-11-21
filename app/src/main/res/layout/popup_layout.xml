@@ -19,7 +19,8 @@
         android:textStyle="bold"
         android:text="공지사항"
         android:background="@color/colormain"
-        android:fontFamily="@font/spoqa_han_sans_bold" />
+        android:fontFamily="@font/spoqa_han_sans_bold"
+        tools:ignore="HardcodedText" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/popup_scroll"
@@ -57,7 +58,7 @@
         android:text="오늘하루 그만보기"
         android:textSize="13dp"
         android:elevation="8dp"
-        tools:ignore="SpUsage"
+        tools:ignore="ButtonStyle,HardcodedText,SpUsage"
         android:fontFamily="@font/spoqa_han_sans_regular"/>
 
         <Button
@@ -70,7 +71,7 @@
             android:textSize="13dp"
             android:elevation="8dp"
             android:padding="2dp"
-            tools:ignore="SpUsage"
+            tools:ignore="ButtonStyle,SpUsage"
             android:fontFamily="@font/spoqa_han_sans_regular"/>
 
     </LinearLayout>

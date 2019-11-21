@@ -84,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // 툴바 = <- 버튼 보이게 하기
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        popup = new popup_dialog(MainActivity.this,getLeftListener,getRightListener);// 공지사항
+
+        popup.create();
+
         frag1 = new Frag1(); //프래그먼트 객채셍성
         frag2 = new Frag2(); //프래그먼트 객채셍성
         frag3 = new Frag3(); //프래그먼트 객채셍성
@@ -93,9 +97,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
         bottomSheetDialog.setContentView(R.layout.infor_dialog);
 
-        popup = new popup_dialog(MainActivity.this,getLeftListener,getRightListener);// 공지사항
-
-        popup.create();
 
         infor_butt = (Button)bottomSheetDialog.findViewById(R.id.infor_butt);
 
