@@ -78,7 +78,7 @@ public class popup_dialog extends Dialog {
             jsk.execute();
         }
         else {
-            adapter.addItem("메시지가 없습니다.","","");
+            adapter.addItem("","","메시지가 없습니다.");
         }
 
 

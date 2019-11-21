@@ -43,6 +43,8 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     private String[] s_gps;
     private List<LatLng> set_marker;
 
+    private ArrayList<String> bus_num;
+
     private GoogleMap mygoogleMap;
     private boolean stopFlag = false;
 
@@ -54,7 +56,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
     private ArrayList<LatLng> sourcepoints,sourcePoints2,sourcePoints,sourcePoints3, sourcePoints4,sourcePoints5,sourcePoints6;
 
-    private int gps_count = 1;
+
 
     private int bus_count = 0;
 
@@ -90,6 +92,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
 
         set_marker = new ArrayList<LatLng>();
+        bus_num = new ArrayList<String>();
         s_gps = new String[]{"0", "0", "0"};
 
         mapView.getMapAsync(this);
@@ -222,10 +225,10 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
             for(int i = 0;i<bus_count;i++)
             {
-
+                String merge = bus_num.get(i).concat("호차_셔틀버스");
                 bus_marker_token = mygoogleMap.addMarker(new MarkerOptions()
                         .position(set_marker.get(i))
-                        .title("셔틀 버스")
+                        .title(merge)
                         .anchor(0.5f,0.5f)
                         .icon(BitmapDescriptorFactory.fromBitmap(getMarkerBitmapFromView_bus()))
                         .zIndex(10));
@@ -244,8 +247,10 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
             for(int i = 0;i<bus_count;i++)
             {
-                bus_markers.get(i).setPosition(set_marker.get(i));
+                String merge = bus_num.get(i).concat("호차_셔틀버스");
 
+                bus_markers.get(i).setPosition(set_marker.get(i));
+                bus_markers.get(i).setTitle(merge);
             }
         }
 
@@ -639,10 +644,11 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 int [] numberArray = new int[]{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
                 bus_count = 0;
-                gps_count = 1;
+
 
                 if(!set_marker.isEmpty()) {
                     set_marker.clear();
+                    bus_num.clear();
                 }
 
 
@@ -674,16 +680,22 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 for(int i=0;i<gps_split.length/5;i++) {
                     for (int j = 0; j < 3; j++) {
                         s_gps[j] = gps_split[i * 5 + j];
-                        //System.out.println("좌표");
-                        //System.out.println(s_gps[j]);
+
                     }
-                     if(numberArray[gps_count] == 0 && Integer.parseInt(s_gps[0]) == gps_count) {
+                     if(numberArray[Integer.parseInt(s_gps[0])] == 0){
                          set_marker.add(new LatLng(Double.parseDouble(s_gps[1]), Double.parseDouble(s_gps[2])));
+                         bus_num.add(s_gps[0]);
                          System.out.println("set_marker");
                          System.out.println(set_marker.get(bus_count));
-                         gps_count++;
+                         numberArray[Integer.parseInt(s_gps[0])]++;
                          bus_count++;
                      }
+
+
+//                    System.out.println("배열");
+//                     for(int j = 0;j<numberArray.length;j++) {
+//                         System.out.println(numberArray[j]);
+//                     }
 
                 }
 
