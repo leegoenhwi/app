@@ -74,4 +74,9 @@ public class ListViewAdapter extends BaseAdapter {
 
         listViewItemList.add(item);
     }
+
+    public void removeItem(int index) {
+
+        listViewItemList.remove(index);
+    }
 }

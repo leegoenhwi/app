@@ -47,6 +47,7 @@ public class popup_dialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.out.println("팝업 온크리에이트");
 
         // 다이얼로그 외부 화면 흐리게 표현
         WindowManager.LayoutParams lpWindow = new WindowManager.LayoutParams();
@@ -69,6 +70,7 @@ public class popup_dialog extends Dialog {
         adapter = new ListViewAdapter();
 
         listView.setAdapter(adapter);
+        adapter.addItem("","","메시지가 없습니다.");
 
         //어싱크테스크 객체 생성
         jsk = new JsoupAsyncTask();
@@ -76,9 +78,6 @@ public class popup_dialog extends Dialog {
         if(getConnectivityStatus(getContext()) != TYPE_NOT_CONNECTED)
         {
             jsk.execute();
-        }
-        else {
-            adapter.addItem("","","메시지가 없습니다.");
         }
 
 
@@ -140,7 +139,7 @@ public class popup_dialog extends Dialog {
     @Override
     public void onStart()
     {
-        System.out.println("온스타트");
+        System.out.println("팝업 온스타트");
         super.onStart();
     }
 
@@ -205,6 +204,8 @@ public class popup_dialog extends Dialog {
             if(!time.isEmpty())
             {
                 System.out.println("연결확인");
+                
+                adapter.removeItem(0);
                 for(int i = 0;i < time.size();i++)
                 {
                     adapter.addItem(time.get(i),title.get(i),content.get(i));
@@ -212,11 +213,6 @@ public class popup_dialog extends Dialog {
                 }
             }
 
-            else
-            {
-                System.out.println("연결안됨");
-                adapter.addItem("","","메시지가 없습니다.");
-            }
 
 
         }
