@@ -204,7 +204,7 @@ public class popup_dialog extends Dialog {
             if(!time.isEmpty())
             {
                 System.out.println("연결확인");
-                
+
                 adapter.removeItem(0);
                 for(int i = 0;i < time.size();i++)
                 {
