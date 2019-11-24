@@ -695,6 +695,8 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
                 }
 
+//                System.out.println("테스트");
+//                gps_data("36.15e18","127.1e2s15");
 
                 try {
                     System.out.println("버스 카운터");
@@ -751,6 +753,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
             return 0;
         }
 
+        System.out.println("거짓");
         return 1;
     }
 
