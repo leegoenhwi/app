@@ -7,12 +7,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.core.widget.NestedScrollView;
 
@@ -105,14 +107,18 @@ public class popup_dialog extends Dialog {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                TextView title_view = view.findViewById(R.id.list_title);
                 View decs_view = view.findViewById(R.id.list_desc);
 
                 if(decs_view.getVisibility() == View.GONE)
                 {
                     decs_view.setVisibility(View.VISIBLE);
+                    title_view.setSingleLine(false);
                 }
                 else{
                     decs_view.setVisibility(View.GONE);
+                    title_view.setSingleLine(true);
+                    title_view.setEllipsize(TextUtils.TruncateAt.END);
                 }
             }
         });

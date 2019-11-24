@@ -50,6 +50,8 @@
                 android:id="@+id/list_title"
                 android:text="New Text"
                 android:textSize="13dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:gravity="center_vertical"
                 tools:ignore="SpUsage" />
         </LinearLayout>

@@ -682,7 +682,9 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                         s_gps[j] = gps_split[i * 5 + j];
 
                     }
-                     if(numberArray[Integer.parseInt(s_gps[0])] == 0){
+                     if((numberArray[Integer.parseInt(s_gps[0])] == 0) && gps_data(s_gps[1],s_gps[2]) == 0){
+
+
                          set_marker.add(new LatLng(Double.parseDouble(s_gps[1]), Double.parseDouble(s_gps[2])));
                          bus_num.add(s_gps[0]);
                          System.out.println("set_marker");
@@ -690,12 +692,6 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                          numberArray[Integer.parseInt(s_gps[0])]++;
                          bus_count++;
                      }
-
-
-//                    System.out.println("배열");
-//                     for(int j = 0;j<numberArray.length;j++) {
-//                         System.out.println(numberArray[j]);
-//                     }
 
                 }
 
@@ -743,6 +739,34 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
     }
 
+    //gps 값 예외처리
+    private int gps_data(String left,String right)
+    {
+        boolean b1 = left.startsWith("36.");
+        boolean b2 = right.startsWith("127.");
 
+        if(b1 && b2 && String_compare(left.substring(3)) && String_compare(right.substring(4)))
+        {
+            System.out.println("참");
+            return 0;
+        }
 
+        return 1;
+    }
+
+    //문자열 숫자 검사
+    private boolean String_compare(String empty)
+    {
+        System.out.println(empty);
+        for(int i = 0;i < empty.length();i++)
+        {
+            System.out.println(empty.charAt(i));
+
+            if((48 > empty.charAt(i)) || (empty.charAt(i) > 57))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
