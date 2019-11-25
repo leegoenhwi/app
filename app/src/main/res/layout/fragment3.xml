@@ -11,37 +11,37 @@
     >
 
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:layout_weight="3"
-    android:background="@color/colortitle"
-    android:elevation="5dp"
-    android:orientation="vertical"
-    android:gravity="center">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_weight="3"
+        android:background="@color/colortitle"
+        android:elevation="5dp"
+        android:orientation="vertical"
+        android:gravity="center">
 
         <com.nex3z.togglebuttongroup.SingleSelectToggleGroup
             android:id="@+id/group_choices"
-            android:layout_width="260dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
-        <com.nex3z.togglebuttongroup.button.CircularToggle
-            android:id="@+id/choice_a"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="월"
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_a"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="월"
 
-            app:tbgMarkerColor="@color/colormain"
-            tools:ignore="HardcodedText" />
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
 
-        <com.nex3z.togglebuttongroup.button.CircularToggle
-            android:id="@+id/choice_b"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="화"
+            <com.nex3z.togglebuttongroup.button.CircularToggle
+                android:id="@+id/choice_b"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="화"
 
-            app:tbgMarkerColor="@color/colormain"
-            tools:ignore="HardcodedText" />
+                app:tbgMarkerColor="@color/colormain"
+                tools:ignore="HardcodedText" />
 
             <com.nex3z.togglebuttongroup.button.CircularToggle
                 android:id="@+id/choice_c"
@@ -91,42 +91,47 @@
         </com.nex3z.togglebuttongroup.SingleSelectToggleGroup>
 
 
-    <com.nex3z.togglebuttongroup.SingleSelectToggleGroup
-        android:id="@+id/group_choices2"
-        android:paddingTop="15dp"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center">
-
-        <com.nex3z.togglebuttongroup.button.LabelToggle
-            android:id="@+id/choice_osan"
-            android:text="아산역"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:tbgMarkerColor="@color/colormain"
-            tools:ignore="HardcodedText" />
+            android:paddingTop="15dp"
+            android:gravity="center">
 
-        <com.nex3z.togglebuttongroup.button.LabelToggle
-            android:id="@+id/choice_Cheonan_terminal"
-            android:paddingLeft="29dp"
-            android:text="천안 터미널"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:tbgMarkerColor="@color/colormain"
-            tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
+            <com.nex3z.togglebuttongroup.SingleSelectToggleGroup
+                android:id="@+id/group_choices2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-        <com.nex3z.togglebuttongroup.button.LabelToggle
-            android:id="@+id/choice_Cheonan"
-            android:paddingLeft="29dp"
-            android:text="천안역"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:tbgMarkerColor="@color/colormain"
-            tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
+                <com.nex3z.togglebuttongroup.button.LabelToggle
+                    android:id="@+id/choice_osan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="아산역"
+                    app:tbgMarkerColor="@color/colormain"
+                    tools:ignore="HardcodedText" />
 
-    </com.nex3z.togglebuttongroup.SingleSelectToggleGroup>
+                <com.nex3z.togglebuttongroup.button.LabelToggle
+                    android:id="@+id/choice_Cheonan_terminal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:text="천안 터미널"
+                    app:tbgMarkerColor="@color/colormain"
+                    tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
 
-</LinearLayout>
+                <com.nex3z.togglebuttongroup.button.LabelToggle
+                    android:id="@+id/choice_Cheonan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="천안역"
+                    app:tbgMarkerColor="@color/colormain"
+                    tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry" />
+
+            </com.nex3z.togglebuttongroup.SingleSelectToggleGroup>
+        </LinearLayout>
+
+    </LinearLayout>
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -137,112 +142,112 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/group_choices">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:weightSum="10"
-        android:orientation="horizontal"
-        tools:ignore="DisableBaselineAlignment">
-
         <LinearLayout
-            android:layout_weight="5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:padding="20dp">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:weightSum="10"
+            android:orientation="horizontal"
+            tools:ignore="DisableBaselineAlignment">
+
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_weight="5"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:weightSum="10"
-                android:orientation="vertical"
-                tools:ignore="UselessParent">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:text="학교 출발"
-                    android:textColor="#696969"
-                    android:fontFamily="@font/spoqa_han_sans_regular"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    tools:ignore="HardcodedText" />
-                <androidx.core.widget.NestedScrollView
+                android:gravity="center"
+                android:padding="20dp">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/school_start"
-                    android:background="@color/colortitle"
-                    android:scrollbars="vertical"
-                    android:descendantFocusability="blocksDescendants"
-                    >
-
-                    <LinearLayout
-                        android:id="@+id/scroll_vertical_layout1"
+                    android:weightSum="10"
+                    android:orientation="vertical"
+                    tools:ignore="UselessParent">
+                    <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="fill_parent"
-                        android:orientation="vertical"
+                        android:layout_height="30dp"
+                        android:text="학교 출발"
+                        android:textColor="#696969"
+                        android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:textSize="16sp"
                         android:gravity="center"
-                        tools:ignore="ScrollViewSize">
+                        android:includeFontPadding="false"
+                        tools:ignore="HardcodedText" />
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/school_start"
+                        android:background="@color/colortitle"
+                        android:scrollbars="vertical"
+                        android:descendantFocusability="blocksDescendants"
+                        >
 
-                    </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/scroll_vertical_layout1"
+                            android:layout_width="match_parent"
+                            android:layout_height="fill_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            tools:ignore="ScrollViewSize">
 
-                </androidx.core.widget.NestedScrollView>
+                        </LinearLayout>
+
+                    </androidx.core.widget.NestedScrollView>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_weight="5"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="20dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:weightSum="10"
+                    android:orientation="vertical"
+                    tools:ignore="UselessParent">
+                    <TextView
+                        android:id="@+id/right_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:text="아산역 출발"
+                        android:textColor="#696969"
+                        android:fontFamily="@font/spoqa_han_sans_regular"
+                        android:textSize="16sp"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        tools:ignore="HardcodedText" />
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/school_arrive"
+                        android:background="@color/colortitle"
+                        android:descendantFocusability="blocksDescendants">
+
+                        <LinearLayout
+                            android:id="@+id/scroll_vertical_layout2"
+                            android:layout_width="match_parent"
+                            android:layout_height="fill_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            tools:ignore="ScrollViewSize">
+
+                        </LinearLayout>
+
+                    </androidx.core.widget.NestedScrollView>
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_weight="5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:padding="20dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:weightSum="10"
-                android:orientation="vertical"
-                tools:ignore="UselessParent">
-                <TextView
-                    android:id="@+id/right_textview"
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:text="아산역 출발"
-                    android:textColor="#696969"
-                    android:fontFamily="@font/spoqa_han_sans_regular"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    tools:ignore="HardcodedText" />
-                <androidx.core.widget.NestedScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/school_arrive"
-                    android:background="@color/colortitle"
-                    android:descendantFocusability="blocksDescendants">
-
-                    <LinearLayout
-                        android:id="@+id/scroll_vertical_layout2"
-                        android:layout_width="match_parent"
-                        android:layout_height="fill_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        tools:ignore="ScrollViewSize">
-
-                    </LinearLayout>
-
-                </androidx.core.widget.NestedScrollView>
-
-            </LinearLayout>
-
 
         </LinearLayout>
-
-
-
-    </LinearLayout>
 
 
 
