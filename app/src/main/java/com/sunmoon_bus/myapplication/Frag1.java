@@ -1,5 +1,6 @@
 package com.sunmoon_bus.myapplication;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -30,7 +31,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Frag1 extends Fragment implements OnMapReadyCallback{
@@ -44,6 +48,8 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     private List<LatLng> set_marker;
 
     private ArrayList<String> bus_num;
+
+    private ArrayList<String> bus_time;
 
     private GoogleMap mygoogleMap;
     private boolean stopFlag = false;
@@ -93,7 +99,8 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
         set_marker = new ArrayList<LatLng>();
         bus_num = new ArrayList<String>();
-        s_gps = new String[]{"0", "0", "0"};
+        bus_time = new ArrayList<String>();
+        s_gps = new String[]{"0", "0", "0","0","0"};
 
         mapView.getMapAsync(this);
 
@@ -218,7 +225,13 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     //실시간 버스 위치 갱신 초기화
     private void in_gps_bus()
     {
-
+        System.out.println("좌표값");
+        for(int i = 0;i<set_marker.size();i++)
+        {
+            System.out.println(bus_num.get(i));
+            System.out.println(set_marker.get(i));
+            System.out.println(bus_time.get(i));
+        }
 
         if(bus_markers.isEmpty()) {
             System.out.println("버스 마커 생김");
@@ -649,6 +662,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 if(!set_marker.isEmpty()) {
                     set_marker.clear();
                     bus_num.clear();
+                    bus_time.clear();
                 }
 
 
@@ -678,13 +692,30 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                 gps_split = gps.text().split(" ");
 
                 for(int i=0;i<gps_split.length/5;i++) {
-                    for (int j = 0; j < 3; j++) {
-                        s_gps[j] = gps_split[i * 5 + j];
-
+                    for (int j=0;j<5;j++){
+                        s_gps[j]=gps_split[i*5+j];
                     }
+
+                    if((numberArray[Integer.parseInt(s_gps[0])] != 0) && gps_data(s_gps[1],s_gps[2]) == 0)
+                    {
+                        String empty = s_gps[3].concat(s_gps[4]);
+
+                        if(compare_time(empty,bus_time.get(bus_num.indexOf(s_gps[0])))) {
+                            System.out.println("최근시간");
+                            System.out.println(empty);
+                            System.out.println(s_gps[0]);
+                            System.out.println(s_gps[1]);
+                            System.out.println(s_gps[2]);
+                            bus_time.set(bus_num.indexOf(s_gps[0]),empty);
+                            set_marker.set(bus_num.indexOf(s_gps[0]), new LatLng(Double.parseDouble(s_gps[1]), Double.parseDouble(s_gps[2])));
+                        }
+                    }
+
                      if((numberArray[Integer.parseInt(s_gps[0])] == 0) && gps_data(s_gps[1],s_gps[2]) == 0){
-
-
+                         System.out.println("날짜시간");
+                         String empty = s_gps[3].concat(s_gps[4]);
+                         System.out.println(empty);
+                         bus_time.add(empty);
                          set_marker.add(new LatLng(Double.parseDouble(s_gps[1]), Double.parseDouble(s_gps[2])));
                          bus_num.add(s_gps[0]);
                          System.out.println("set_marker");
@@ -760,10 +791,10 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
     //문자열 숫자 검사
     private boolean String_compare(String empty)
     {
-        System.out.println(empty);
+        //System.out.println(empty);
         for(int i = 0;i < empty.length();i++)
         {
-            System.out.println(empty.charAt(i));
+            //System.out.println(empty.charAt(i));
 
             if((48 > empty.charAt(i)) || (empty.charAt(i) > 57))
             {
@@ -771,5 +802,30 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
             }
         }
         return true;
+    }
+
+    //시간 비교
+    private boolean compare_time(String time1,String time2)
+    {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss");
+        try {
+            Date date1 = dateFormat.parse(time1);
+            Date date2 = dateFormat.parse(time2);
+
+            long diff = date1.getTime() - date2.getTime();
+
+            if(diff >= 0)
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
