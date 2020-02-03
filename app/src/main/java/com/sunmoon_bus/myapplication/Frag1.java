@@ -41,7 +41,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
 
     private View view;
     private MapView mapView = null;
-    private String url_gps = "http://119.67.32.123:8840/VSS.php";
+    private String url_gps = "http://175.212.192.150/VSS.php";
 
     private String[] gps_split;
     private String[] s_gps;
@@ -696,6 +696,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                         s_gps[j]=gps_split[i*5+j];
                     }
 
+
                     if((numberArray[Integer.parseInt(s_gps[0])] != 0) && gps_data(s_gps[1],s_gps[2]) == 0)
                     {
                         String empty = s_gps[3].concat(s_gps[4]);
@@ -725,6 +726,7 @@ public class Frag1 extends Fragment implements OnMapReadyCallback{
                      }
 
                 }
+
 
 //                System.out.println("테스트");
 //                gps_data("36.15e18","127.1e2s15");

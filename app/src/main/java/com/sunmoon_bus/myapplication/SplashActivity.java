@@ -16,14 +16,9 @@ public class SplashActivity extends AppCompatActivity {
         //세로로 고정
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        try {
-            Thread.sleep(300);
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        }
     }
 
 

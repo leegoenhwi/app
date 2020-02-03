@@ -19,7 +19,7 @@ import org.jsoup.select.Elements;
 
 public class Frag2 extends Fragment {
     private SwipeRefreshLayout refresh_Layout2;
-    private String url_num = "http://119.67.32.123:8840/bus_count.php";
+    private String url_num = "http://175.212.192.150/bus_count.php";
     private TextView cheonan_num;
     private TextView cheonan_t_num;
     private TextView osan_num;

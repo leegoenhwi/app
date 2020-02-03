@@ -33,7 +33,7 @@ public class popup_dialog extends Dialog {
     private ListView listView;
     private NestedScrollView popup_scroll;
     private  ListViewAdapter adapter;
-    private String notice_url = "http://119.67.32.123:8840/bus_notice.php";
+    private String notice_url = "http://175.212.192.150/bus_notice.php";
     private ArrayList<String> time = new ArrayList<String>();
     private ArrayList<String> title = new ArrayList<String>();
     private ArrayList<String> content = new ArrayList<String>();
